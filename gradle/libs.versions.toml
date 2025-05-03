@@ -15,6 +15,7 @@ coil = "3.1.0"
 room = "2.7.1"
 ksp = "2.1.20-2.0.0"
 kstore = "0.9.1"
+sqlite = "2.5.0"
 
 [libraries]
 
@@ -43,6 +44,7 @@ coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.re
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
+sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite" }
 
 [plugins]
 

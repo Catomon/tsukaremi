@@ -44,6 +44,7 @@ kotlin {
             implementation(libs.coil.network.ktor)
             implementation(libs.room.runtime)
             implementation(libs.kstore)
+            implementation(libs.sqlite.bundled)
 
             implementation("io.insert-koin:koin-core:4.0.3")
         }

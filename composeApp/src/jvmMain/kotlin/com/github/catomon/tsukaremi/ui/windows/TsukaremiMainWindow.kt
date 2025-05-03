@@ -38,7 +38,7 @@ fun ApplicationScope.TsukaremiMainWindow(modifier: Modifier = Modifier) {
         TsukaremiTheme {
             WindowDraggableArea {
                 CompositionLocalProvider(LocalWindow provides window) {
-                    TsukaremiMainScreen(modifier.luckyWindowDecoration().fillMaxSize())
+                    TsukaremiMainScreen(modifier = modifier.luckyWindowDecoration().fillMaxSize())
                 }
             }
         }
