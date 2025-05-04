@@ -42,20 +42,6 @@ fun TsukaremiMainScreen(
     val navController = rememberNavController()
     val reminders by viewModel.reminders.collectAsState()
 
-    LaunchedEffect(Unit) {
-        repeat(100) {
-            viewModel.repository.insertReminder(
-                Reminder(
-                    title = "sssssssssss",
-                    description = "dddddddddd",
-                    remindAt = LocalDateTime.now()
-                )
-            )
-
-            delay(5000)
-        }
-    }
-
     LaunchedEffect(navController, viewModel.navigation) {
         viewModel.navigation.collect { navTarget ->
             when (navTarget) {
