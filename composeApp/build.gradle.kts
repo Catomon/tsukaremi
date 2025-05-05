@@ -46,7 +46,13 @@ kotlin {
             implementation(libs.kstore)
             implementation(libs.sqlite.bundled)
 
-            implementation("io.insert-koin:koin-core:4.0.3")
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.compose.viewmodel.navigation)
+
+//            implementation("io.insert-koin:koin-ktor:$koin_ktor")
+//            implementation("io.insert-koin:koin-logger-slf4j:$koin_ktor")
         }
 
         commonTest.dependencies {

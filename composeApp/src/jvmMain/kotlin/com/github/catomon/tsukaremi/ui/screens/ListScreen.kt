@@ -32,11 +32,7 @@ import com.github.catomon.tsukaremi.domain.model.Reminder
 import kotlinx.serialization.Serializable
 
 @Serializable
-object ListDestination {
-    override fun toString(): String {
-        return "list"
-    }
-}
+object ListDestination
 
 @Composable
 fun ListScreen(reminders: List<Reminder>, onCreateNew: () -> Unit, modifier: Modifier = Modifier) {

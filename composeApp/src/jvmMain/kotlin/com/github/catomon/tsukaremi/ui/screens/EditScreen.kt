@@ -18,11 +18,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.components.DatePickerDialog
 import com.github.catomon.tsukaremi.ui.components.TimePickerDialog
+import com.github.catomon.tsukaremi.ui.viewmodel.EditViewModel
 import com.github.catomon.tsukaremi.util.formatMillisToDateString
 import kotlinx.serialization.Serializable
-import java.text.DateFormat
+import org.koin.compose.viewmodel.koinViewModel
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -30,19 +32,17 @@ import java.time.LocalTime
 import java.time.ZoneId
 
 @Serializable
-object EditDestination {
-    override fun toString(): String {
-        return "edit"
-    }
-}
+data class EditDestination(val reminderId: Int? = null)
 
 @Composable
 fun EditScreen(
+    viewModel: EditViewModel = koinViewModel(),
     onBack: () -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
+    val reminder by viewModel.reminder
+    val loading by viewModel.loading
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var showDatePickDialog by remember { mutableStateOf(false) }
@@ -63,7 +63,8 @@ fun EditScreen(
                     label = { Text("Title") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(0.99f)
+                        .weight(0.99f),
+                    enabled = !loading
                 )
 
                 TextField(
@@ -72,7 +73,8 @@ fun EditScreen(
                     label = { Text("Description") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(0.99f)
+                        .weight(0.99f),
+                    enabled = !loading
                 )
 
                 Row(
@@ -80,15 +82,21 @@ fun EditScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Button(onClick = {
-                        showDatePickDialog = true
-                    }) {
+                    Button(
+                        onClick = {
+                            showDatePickDialog = true
+                        },
+                        enabled = !loading
+                    ) {
                         Text(remember(selectedDateTime) { formatMillisToDateString(selectedDateTime) })
                     }
 
-                    Button(onClick = {
-                        showTimePickDialog = true
-                    }) {
+                    Button(
+                        onClick = {
+                            showTimePickDialog = true
+                        },
+                        enabled = !loading
+                    ) {
                         Text("%02d:%02d".format(selectedTime.first, selectedTime.second))
                     }
                 }
@@ -102,7 +110,25 @@ fun EditScreen(
                         Text("BACK")
                     }
 
-                    TextButton(onClick = onConfirm) {
+                    TextButton(
+                        onClick = {
+                            val updatedReminder = Reminder(
+                                id = reminder?.id ?: 0,
+                                title = title,
+                                description = description,
+                                remindAt = LocalDateTime.ofInstant(
+                                    Instant.ofEpochMilli(selectedDateTime + selectedTime.first.toLong() * 60L * 60L * 1000L),
+                                    ZoneId.systemDefault()
+                                ),
+                                isCompleted = false,
+                                repeatDailyFrom = null,
+                                repeatDailyTo = null
+                            )
+                            viewModel.saveReminder(updatedReminder)
+                            onConfirm()
+                        },
+                        enabled = !loading
+                    ) {
                         Text("CONFIRM")
                     }
                 }

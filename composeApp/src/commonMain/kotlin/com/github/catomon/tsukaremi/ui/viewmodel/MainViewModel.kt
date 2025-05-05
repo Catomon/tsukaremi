@@ -15,8 +15,8 @@ class MainViewModel(
     val repository: RemindersRepository,
     val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
-    private val _navigation = MutableSharedFlow<NavTarget>(extraBufferCapacity = 1)
-    val navigation = _navigation.asSharedFlow()
+//    private val _navigation = MutableSharedFlow<NavTarget>(extraBufferCapacity = 1)
+//    val navigation = _navigation.asSharedFlow()
 
     val reminders = repository.getAllReminders().stateIn(
         scope = viewModelScope,
@@ -24,11 +24,11 @@ class MainViewModel(
         initialValue = emptyList()
     )
 
-    fun onNavigate(destination: String) {
-        _navigation.tryEmit(NavTarget.NavigateTo(destination))
-    }
-
-    fun onPopBack() {
-        _navigation.tryEmit(NavTarget.PopBack)
-    }
+//    fun <T> onNavigate(destination: T) {
+//        _navigation.tryEmit(NavTarget.NavigateTo(destination))
+//    }
+//
+//    fun onPopBack() {
+//        _navigation.tryEmit(NavTarget.PopBack)
+//    }
 }

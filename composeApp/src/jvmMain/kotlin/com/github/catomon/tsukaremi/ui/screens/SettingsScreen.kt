@@ -17,11 +17,7 @@ import com.github.catomon.tsukaremi.ui.compositionlocals.LocalNavController
 import kotlinx.serialization.Serializable
 
 @Serializable
-object SettingsDestination {
-    override fun toString(): String {
-        return "settings"
-    }
-}
+object SettingsDestination
 
 @Composable
 fun SettingsScreen(

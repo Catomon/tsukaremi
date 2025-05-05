@@ -25,14 +25,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalNavController
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalWindow
-import com.github.catomon.tsukaremi.ui.viewmodel.MainViewModel
 import com.github.catomon.tsukaremi.ui.navigation.NavTarget
-import kotlinx.coroutines.delay
+import com.github.catomon.tsukaremi.ui.viewmodel.MainViewModel
 import org.koin.java.KoinJavaComponent.get
-import java.time.LocalDateTime
 
 @Composable
 fun TsukaremiMainScreen(
@@ -42,14 +39,20 @@ fun TsukaremiMainScreen(
     val navController = rememberNavController()
     val reminders by viewModel.reminders.collectAsState()
 
-    LaunchedEffect(navController, viewModel.navigation) {
-        viewModel.navigation.collect { navTarget ->
-            when (navTarget) {
-                is NavTarget.NavigateTo -> navController.navigate(navTarget.route)
-                is NavTarget.PopBack -> navController.popBackStack()
-            }
-        }
-    }
+//    LaunchedEffect(navController, viewModel.navigation) {
+//        viewModel.navigation.collect { navTarget ->
+//            when (navTarget) {
+//                is NavTarget.NavigateTo<*> -> {
+//                    when (val route = navTarget.route) {
+//                        is EditDestination -> navController.navigate(route)
+//                        is ListDestination -> navController.navigate(route)
+//                        is SettingsDestination -> navController.navigate(route)
+//                    }
+//                }
+//                is NavTarget.PopBack -> navController.popBackStack()
+//            }
+//        }
+//    }
 
     Box(Modifier.fillMaxSize()) {
         Column(
@@ -63,7 +66,7 @@ fun TsukaremiMainScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("つかれみ", Modifier.clip(RoundedCornerShape(8.dp)).clickable {
-                    viewModel.onNavigate(ListDestination.toString())
+                    navController.navigate(ListDestination)
                 })
 
                 Text("---", modifier = Modifier.clickable {
@@ -74,23 +77,23 @@ fun TsukaremiMainScreen(
             CompositionLocalProvider(LocalNavController provides navController) {
                 NavHost(
                     navController = navController,
-                    startDestination = ListDestination.toString(),
+                    startDestination = ListDestination,
                     enterTransition = { slideInHorizontally { it } },
                     exitTransition = { slideOutHorizontally { it } }
                 ) {
-                    composable(ListDestination.toString()) {
+                    composable<ListDestination> {
                         ListScreen(reminders = reminders, onCreateNew = {
-                            viewModel.onNavigate(EditDestination.toString())
+                            navController.navigate(EditDestination())
                         })
                     }
 
-                    composable(EditDestination.toString()) {
-                        EditScreen(onBack = viewModel::onPopBack, onConfirm = viewModel::onPopBack)
+                    composable<EditDestination> {
+                        EditScreen(onBack = navController::popBackStack, onConfirm = navController::popBackStack)
                     }
 
-                    composable(SettingsDestination.toString()) {
+                    composable<SettingsDestination> {
                         SettingsScreen(
-                            onBack = viewModel::onPopBack, onExitApp = viewModel::onPopBack
+                            onBack = navController::popBackStack, onExitApp = navController::popBackStack
                         )
                     }
                 }
