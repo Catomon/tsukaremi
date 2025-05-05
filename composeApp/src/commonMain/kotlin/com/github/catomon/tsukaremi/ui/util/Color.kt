@@ -1,4 +1,4 @@
-package com.github.catomon.tsukaremi.util
+package com.github.catomon.tsukaremi.ui.util
 
 import androidx.compose.ui.graphics.Color
 

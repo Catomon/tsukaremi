@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.github.catomon.tsukaremi.ui.windows.WindowConfig
-import com.github.catomon.tsukaremi.util.darken
+import com.github.catomon.tsukaremi.ui.util.darken
 
 @Composable
 fun Modifier.luckyWindowDecoration(): Modifier {
