@@ -3,9 +3,13 @@ package com.github.catomon.tsukaremi.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -18,10 +22,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.components.DatePickerDialog
 import com.github.catomon.tsukaremi.ui.components.TimePickerDialog
 import com.github.catomon.tsukaremi.ui.viewmodel.EditViewModel
+import com.github.catomon.tsukaremi.util.combineDateAndTime
 import com.github.catomon.tsukaremi.util.formatMillisToDateString
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
@@ -42,16 +49,20 @@ fun EditScreen(
     modifier: Modifier = Modifier,
 ) {
     val reminder by viewModel.reminder
-    val loading by viewModel.loading
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+
     var showDatePickDialog by remember { mutableStateOf(false) }
     var showTimePickDialog by remember { mutableStateOf(false) }
-    var selectedDateTime by remember { mutableStateOf(System.currentTimeMillis()) }
+
+    var selectedDateMillis by remember { mutableStateOf(System.currentTimeMillis()) }
     var selectedTime by remember { mutableStateOf(LocalTime.now().let { it.hour to it.minute }) }
-    val timeSelectableFrom = remember(selectedDateTime, selectedTime) {
-        getTimeSelectableFromDate(selectedDateTime)
+
+    val timeSelectableFrom = remember(selectedDateMillis, selectedTime) {
+        getTimeSelectableFromDate(selectedDateMillis)
     }
+
+    val loading by viewModel.loading
 
     Surface(modifier) {
         Box(modifier = modifier.fillMaxSize()) {
@@ -61,9 +72,7 @@ fun EditScreen(
                     value = title,
                     onValueChange = { title = it },
                     label = { Text("Title") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(0.99f),
+                    modifier = Modifier.fillMaxWidth(),
                     enabled = !loading
                 )
 
@@ -71,11 +80,11 @@ fun EditScreen(
                     value = description,
                     onValueChange = { description = it },
                     label = { Text("Description") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(0.99f),
+                    modifier = Modifier.fillMaxWidth().height(100.dp),
                     enabled = !loading
                 )
+
+                Spacer(Modifier.weight(1f))
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -85,19 +94,31 @@ fun EditScreen(
                     Button(
                         onClick = {
                             showDatePickDialog = true
-                        },
-                        enabled = !loading
+                        }, enabled = !loading, contentPadding = PaddingValues(32.dp)
                     ) {
-                        Text(remember(selectedDateTime) { formatMillisToDateString(selectedDateTime) })
+                        Text(
+                            remember(selectedDateMillis) {
+                                "Date:\n" + formatMillisToDateString(
+                                    selectedDateMillis
+                                )
+                            },
+                            modifier = Modifier.sizeIn(minWidth = 96.dp),
+                            textAlign = TextAlign.Center
+                        )
                     }
 
                     Button(
                         onClick = {
                             showTimePickDialog = true
-                        },
-                        enabled = !loading
+                        }, enabled = !loading, contentPadding = PaddingValues(32.dp)
                     ) {
-                        Text("%02d:%02d".format(selectedTime.first, selectedTime.second))
+                        Text(
+                            "Time:\n" + "%02d:%02d".format(
+                                selectedTime.first, selectedTime.second
+                            ),
+                            modifier = Modifier.sizeIn(minWidth = 96.dp),
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
 
@@ -117,7 +138,11 @@ fun EditScreen(
                                 title = title,
                                 description = description,
                                 remindAt = LocalDateTime.ofInstant(
-                                    Instant.ofEpochMilli(selectedDateTime + selectedTime.first.toLong() * 60L * 60L * 1000L),
+                                    combineDateAndTime(
+                                        selectedDateMillis,
+                                        selectedTime.first,
+                                        selectedTime.second
+                                    ),
                                     ZoneId.systemDefault()
                                 ),
                                 isCompleted = false,
@@ -126,8 +151,7 @@ fun EditScreen(
                             )
                             viewModel.saveReminder(updatedReminder)
                             onConfirm()
-                        },
-                        enabled = !loading
+                        }, enabled = !loading
                     ) {
                         Text("CONFIRM")
                     }
@@ -135,35 +159,27 @@ fun EditScreen(
             }
 
             if (showDatePickDialog) {
-                DatePickerDialog(
-                    onDateSelected = {
-                        selectedDateTime = it
-                    },
-                    onDismiss = {
-                        showDatePickDialog = false
-                    }
-                )
+                DatePickerDialog(onDateSelected = {
+                    selectedDateMillis = it
+                }, onDismiss = {
+                    showDatePickDialog = false
+                })
             } else {
-                if (showTimePickDialog)
-                    TimePickerDialog(
-                        onTimeSelected = {
-                            selectedTime = it
-                        },
-                        onDismiss = {
-                            showTimePickDialog = false
-                        },
-                        timeSelectableFrom = timeSelectableFrom
-                    )
+                if (showTimePickDialog) TimePickerDialog(
+                    onTimeSelected = {
+                        selectedTime = it
+                    }, onDismiss = {
+                        showTimePickDialog = false
+                    }, timeSelectableFrom = timeSelectableFrom
+                )
             }
         }
     }
 }
 
 private fun getTimeSelectableFromDate(selectedDateTime: Long): Pair<Int, Int> {
-    val selectedDate = Instant
-        .ofEpochMilli(selectedDateTime)
-        .atZone(ZoneId.systemDefault())
-        .toLocalDate()
+    val selectedDate =
+        Instant.ofEpochMilli(selectedDateTime).atZone(ZoneId.systemDefault()).toLocalDate()
 
     val currentDate = LocalDate.now()
 

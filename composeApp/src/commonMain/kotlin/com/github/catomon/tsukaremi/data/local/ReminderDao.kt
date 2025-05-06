@@ -25,4 +25,7 @@ interface ReminderDao {
 
     @Query("SELECT * FROM reminders")
     fun getAllReminders(): Flow<List<ReminderEntity>>
+
+    @Query("SELECT * FROM reminders")
+    suspend fun getAllRemindersList(): List<ReminderEntity>
 }

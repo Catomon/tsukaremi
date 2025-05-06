@@ -29,4 +29,8 @@ class RemindersRepositoryImpl(private val reminderDao: ReminderDao) : RemindersR
     override fun getAllReminders(): Flow<List<Reminder>> {
         return reminderDao.getAllReminders().map { list -> list.map { it.toDomain() } }
     }
+
+    override suspend fun getAllRemindersList(): List<Reminder> {
+        return reminderDao.getAllRemindersList().map { it.toDomain() }
+    }
 }

@@ -9,50 +9,40 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalNavController
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalWindow
-import com.github.catomon.tsukaremi.ui.navigation.NavTarget
 import com.github.catomon.tsukaremi.ui.viewmodel.MainViewModel
-import org.koin.java.KoinJavaComponent.get
+import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
+import kotlin.system.exitProcess
 
 @Composable
 fun TsukaremiMainScreen(
-    viewModel: MainViewModel = get(MainViewModel::class.java), modifier: Modifier = Modifier
+    viewModel: MainViewModel = koinViewModel(),
+    exitApplication: () -> Unit = { exitProcess(0) },
+    modifier: Modifier = Modifier
 ) = Surface(modifier = modifier) {
     val window = LocalWindow.current
     val navController = rememberNavController()
     val reminders by viewModel.reminders.collectAsState()
-
-//    LaunchedEffect(navController, viewModel.navigation) {
-//        viewModel.navigation.collect { navTarget ->
-//            when (navTarget) {
-//                is NavTarget.NavigateTo<*> -> {
-//                    when (val route = navTarget.route) {
-//                        is EditDestination -> navController.navigate(route)
-//                        is ListDestination -> navController.navigate(route)
-//                        is SettingsDestination -> navController.navigate(route)
-//                    }
-//                }
-//                is NavTarget.PopBack -> navController.popBackStack()
-//            }
-//        }
-//    }
 
     Box(Modifier.fillMaxSize()) {
         Column(
@@ -61,13 +51,16 @@ fun TsukaremiMainScreen(
             verticalArrangement = Arrangement.Top
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp).height(32.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("つかれみ", Modifier.clip(RoundedCornerShape(8.dp)).clickable {
-                    navController.navigate(ListDestination)
-                })
+                Text(
+                    text = "つかれみ",
+                    fontSize = 24.sp,
+                    modifier = Modifier.clip(RoundedCornerShape(8.dp)).clickable {
+                        navController.navigate(ListDestination)
+                    })
 
                 Text("---", modifier = Modifier.clickable {
                     window.isMinimized = true
@@ -82,18 +75,29 @@ fun TsukaremiMainScreen(
                     exitTransition = { slideOutHorizontally { it } }
                 ) {
                     composable<ListDestination> {
-                        ListScreen(reminders = reminders, onCreateNew = {
-                            navController.navigate(EditDestination())
-                        })
+                        ListScreen(
+                            reminders = reminders, onCreateNew = {
+                                navController.navigate(EditDestination())
+                            },
+                            onDelete = {
+                                viewModel.viewModelScope.launch {
+                                    viewModel.repository.deleteReminder(it)
+                                }
+                            }
+                        )
                     }
 
                     composable<EditDestination> {
-                        EditScreen(onBack = navController::popBackStack, onConfirm = navController::popBackStack)
+                        EditScreen(
+                            onBack = navController::navigateUp,
+                            onConfirm = navController::navigateUp
+                        )
                     }
 
                     composable<SettingsDestination> {
                         SettingsScreen(
-                            onBack = navController::popBackStack, onExitApp = navController::popBackStack
+                            onBack = navController::navigateUp,
+                            onExitApp = exitApplication
                         )
                     }
                 }
