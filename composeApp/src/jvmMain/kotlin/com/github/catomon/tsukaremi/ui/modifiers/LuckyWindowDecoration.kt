@@ -20,7 +20,7 @@ import com.github.catomon.tsukaremi.ui.util.darken
 fun Modifier.luckyWindowDecoration(): Modifier {
     val density = LocalDensity.current
     val shadowColor = MaterialTheme.colorScheme.surface.darken(0.8f)
-    val blinkShadow = MaterialTheme.colorScheme.onSurface.darken(0.5f)
+    val glowColor = MaterialTheme.colorScheme.surface.darken(0.8f)
     return if (WindowConfig.isTransparent)
         this
             .padding(
@@ -31,7 +31,7 @@ fun Modifier.luckyWindowDecoration(): Modifier {
             )
             .drawBehind {
                 drawRoundRect(
-                    color = blinkShadow,
+                    color = glowColor,
                     topLeft = Offset(0f, -2f),
                     size = this.size.copy(),
                     cornerRadius = CornerRadius(12f)

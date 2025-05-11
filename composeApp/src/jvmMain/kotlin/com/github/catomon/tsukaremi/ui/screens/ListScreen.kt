@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.tsukaremi.domain.model.Reminder
@@ -65,25 +66,11 @@ fun ListScreen(reminders: List<Reminder>, onCreateNew: () -> Unit, onDelete: (Re
         Box(contentAlignment = Alignment.Center) {
             LazyColumn(
                 state = listState,
-                contentPadding = PaddingValues(2.dp),
-                modifier = Modifier.fillMaxSize()
+               // contentPadding = PaddingValues(2.dp),
+                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))
             ) {
                 items(reminders, key = { it.id }) {
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth().height(100.dp).padding(2.dp).alpha(if (it.isCompleted) 0.75f else 1f)
-                    ) {
-                        Text(it.title)
-                        Text(it.description)
-                        Spacer(Modifier.weight(1f))
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text(it.remindAt.toString())
-                            Button({
-                                onDelete(it)
-                            }) {
-                                Text("Delete")
-                            }
-                        }
-                    }
+                    ReminderListItem(it, onDelete)
                 }
             }
 
@@ -91,6 +78,30 @@ fun ListScreen(reminders: List<Reminder>, onCreateNew: () -> Unit, onDelete: (Re
                 adapter = scrollbarAdapter, modifier = Modifier.fillMaxHeight().align(
                     Alignment.CenterEnd
                 ).clickable { })
+        }
+    }
+}
+
+@Composable
+fun ReminderListItem(
+    reminder: Reminder,
+    onRemove: (Reminder) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ElevatedCard(
+        modifier = modifier.fillMaxWidth().height(100.dp).padding(4.dp)
+            .alpha(if (reminder.isCompleted) 0.75f else 1f)
+    ) {
+        Text(reminder.title)
+        Text(reminder.description)
+        Spacer(Modifier.weight(1f))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(reminder.remindAt.toString())
+            Button({
+                onRemove(reminder)
+            }) {
+                Text("Remove")
+            }
         }
     }
 }

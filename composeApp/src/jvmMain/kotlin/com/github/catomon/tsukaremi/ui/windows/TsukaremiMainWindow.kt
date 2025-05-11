@@ -27,13 +27,9 @@ import tsukaremi.composeapp.generated.resources.ic_cyclone
 import java.awt.Dimension
 
 @Composable
-fun ApplicationScope.TsukaremiMainWindow(modifier: Modifier = Modifier) {
+fun ApplicationScope.TsukaremiMainWindow(viewModel: MainViewModel = koinViewModel(), modifier: Modifier = Modifier) {
     val windowState =
         rememberWindowState(width = WindowConfig.WIDTH.dp, height = WindowConfig.HEIGHT.dp)
-
-    val trayState = rememberTrayState()
-
-    Tray(icon = painterResource(Res.drawable.ic_cyclone), state = trayState)
 
     Window(
         title = WindowConfig.title,
@@ -46,22 +42,6 @@ fun ApplicationScope.TsukaremiMainWindow(modifier: Modifier = Modifier) {
         alwaysOnTop = false
     ) {
         window.minimumSize = Dimension(WindowConfig.WIDTH / 2, WindowConfig.HEIGHT / 2)
-
-        val viewModel: MainViewModel = koinViewModel()
-
-        LaunchedEffect(Unit) {
-            viewModel.viewModelScope.launch {
-                viewModel.reminderEvents.collect { reminder ->
-                    trayState.sendNotification(
-                        Notification(
-                            title = "Reminder: ${reminder.title}",
-                            message = reminder.description.take(100)
-                                .let { if (it.length == 100) it.dropLast(3) + "..." else it }
-                        )
-                    )
-                }
-            }
-        }
 
         TsukaremiTheme {
             WindowDraggableArea {

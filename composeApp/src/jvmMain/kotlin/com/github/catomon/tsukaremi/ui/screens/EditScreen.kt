@@ -127,7 +127,7 @@ fun EditScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    TextButton(onClick = onBack) {
+                    TextButton(onClick = onBack, modifier = Modifier.weight(0.40f)) {
                         Text("BACK")
                     }
 
@@ -151,7 +151,9 @@ fun EditScreen(
                             )
                             viewModel.saveReminder(updatedReminder)
                             onConfirm()
-                        }, enabled = !loading
+                        },
+                        enabled = !loading,
+                        modifier = Modifier.weight(0.40f)
                     ) {
                         Text("CONFIRM")
                     }

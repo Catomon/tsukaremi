@@ -44,7 +44,7 @@ fun TsukaremiMainScreen(
     val navController = rememberNavController()
     val reminders by viewModel.reminders.collectAsState()
 
-    Box(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize().padding(4.dp)) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
