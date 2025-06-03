@@ -10,11 +10,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.catomon.tsukaremi.ui.windows.WindowConfig
 import com.github.catomon.tsukaremi.ui.util.darken
+import org.jetbrains.skia.FilterBlurMode
+import org.jetbrains.skia.MaskFilter
 
 @Composable
 fun Modifier.luckyWindowDecoration(): Modifier {
@@ -22,31 +29,20 @@ fun Modifier.luckyWindowDecoration(): Modifier {
     val shadowColor = MaterialTheme.colorScheme.surface.darken(0.8f)
     val glowColor = MaterialTheme.colorScheme.surface.darken(0.8f)
     return if (WindowConfig.isTransparent)
-        this
-            .padding(
-                top = 8.dp,
-                start = 8.dp,
-                end = 8.dp,
-                bottom = 8.dp
+        this.padding(8.dp).customShadow().drawBehind {
+            drawRoundRect(
+                color = glowColor,
+                topLeft = Offset(0f, -2f),
+                size = this.size.copy(),
+                cornerRadius = CornerRadius(12f)
             )
-            .drawBehind {
-                drawRoundRect(
-                    color = glowColor,
-                    topLeft = Offset(0f, -2f),
-                    size = this.size.copy(),
-                    cornerRadius = CornerRadius(12f)
-                )
-            }
-            .drawBehind {
-                drawRoundRect(
-                    color = shadowColor,
-                    topLeft = Offset(0f, with(density) { 2.dp.toPx() }),
-                    size = this.size.copy(),
-                    cornerRadius = CornerRadius(12f)
-                )
-            }
-            .blurredShadow(addHeight = 2.dp)
-            .clip(RoundedCornerShape(12.dp))
+            drawRoundRect(
+                color = shadowColor,
+                topLeft = Offset(0f, with(density) { 2.dp.toPx() }),
+                size = this.size.copy(),
+                cornerRadius = CornerRadius(12f)
+            )
+        }.clip(RoundedCornerShape(12.dp))
     else
         this.blurredShadow(cornerRadius = 0.dp)
             .border(
@@ -54,4 +50,37 @@ fun Modifier.luckyWindowDecoration(): Modifier {
                 color = shadowColor,
                 shape = RectangleShape
             )
+}
+
+fun Modifier.customShadow(
+    color: Color = Color.Black,
+    alpha: Float = 0.75f,
+    cornerRadius: Dp = 12.dp,
+    shadowRadius: Dp = 4.dp,
+    offsetX: Dp = 0.dp,
+    offsetY: Dp = 0.dp
+) = drawBehind {
+    val shadowColor = color.copy(alpha = alpha).toArgb()
+
+    drawIntoCanvas { canvas ->
+        val paint = Paint().apply {
+            asFrameworkPaint().apply {
+                this.color = shadowColor
+                maskFilter = MaskFilter.makeBlur(
+                    FilterBlurMode.NORMAL,
+                    shadowRadius.toPx()
+                )
+            }
+        }
+
+        canvas.drawRoundRect(
+            left = offsetX.toPx(),
+            top = offsetY.toPx(),
+            right = size.width + offsetX.toPx(),
+            bottom = size.height + offsetY.toPx(),
+            cornerRadius.toPx(),
+            cornerRadius.toPx(),
+            paint
+        )
+    }
 }

@@ -1,6 +1,7 @@
 package com.github.catomon.tsukaremi.ui.windows
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +23,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
 import com.github.catomon.tsukaremi.domain.model.Reminder
+import com.github.catomon.tsukaremi.ui.components.LuckySurface
 import com.github.catomon.tsukaremi.ui.modifiers.luckyWindowDecoration
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import java.time.LocalDateTime
@@ -51,8 +54,8 @@ private fun ReminderWindowContent(
     reminder: Reminder,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
-) = Surface(modifier.luckyWindowDecoration()) {
-    Column(Modifier.padding(horizontal = 6.dp)) {
+) = LuckySurface(modifier.luckyWindowDecoration()) {
+    Column(Modifier.background(MaterialTheme.colorScheme.background.copy(0.9f)).padding(horizontal = 6.dp)) {
         Text(reminder.title)
         Text(reminder.description)
         Spacer(Modifier.weight(1f))
