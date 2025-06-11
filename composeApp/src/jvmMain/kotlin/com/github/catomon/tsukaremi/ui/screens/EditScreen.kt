@@ -1,5 +1,6 @@
 package com.github.catomon.tsukaremi.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.Button
-import androidx.compose.material3.Surface
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -64,117 +65,114 @@ fun EditScreen(
 
     val loading by viewModel.loading
 
-    Surface(modifier) {
-        Box(modifier = modifier.fillMaxSize()) {
-            Column {
-                Text("Edit")
-                TextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text("Title") },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = !loading
-                )
+    Box(modifier = modifier.fillMaxSize()) {
+        Column {
+            TextField(
+                value = title,
+                onValueChange = { title = it },
+                label = { Text("Title") },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !loading
+            )
 
-                TextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text("Description") },
-                    modifier = Modifier.fillMaxWidth().height(100.dp),
-                    enabled = !loading
-                )
+            TextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text("Description") },
+                modifier = Modifier.fillMaxWidth().height(100.dp),
+                enabled = !loading
+            )
 
-                Spacer(Modifier.weight(1f))
+            Spacer(Modifier.weight(1f))
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth()
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Button(
+                    onClick = {
+                        showDatePickDialog = true
+                    }, enabled = !loading, contentPadding = PaddingValues(32.dp)
                 ) {
-                    Button(
-                        onClick = {
-                            showDatePickDialog = true
-                        }, enabled = !loading, contentPadding = PaddingValues(32.dp)
-                    ) {
-                        Text(
-                            remember(selectedDateMillis) {
-                                "Date:\n" + formatMillisToDateString(
-                                    selectedDateMillis
-                                )
-                            },
-                            modifier = Modifier.sizeIn(minWidth = 96.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-
-                    Button(
-                        onClick = {
-                            showTimePickDialog = true
-                        }, enabled = !loading, contentPadding = PaddingValues(32.dp)
-                    ) {
-                        Text(
-                            "Time:\n" + "%02d:%02d".format(
-                                selectedTime.first, selectedTime.second
-                            ),
-                            modifier = Modifier.sizeIn(minWidth = 96.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    TextButton(onClick = onBack, modifier = Modifier.weight(0.40f)) {
-                        Text("BACK")
-                    }
-
-                    TextButton(
-                        onClick = {
-                            val updatedReminder = Reminder(
-                                id = reminder?.id ?: 0,
-                                title = title,
-                                description = description,
-                                remindAt = LocalDateTime.ofInstant(
-                                    combineDateAndTime(
-                                        selectedDateMillis,
-                                        selectedTime.first,
-                                        selectedTime.second
-                                    ),
-                                    ZoneId.systemDefault()
-                                ),
-                                isCompleted = false,
-                                repeatDailyFrom = null,
-                                repeatDailyTo = null
+                    Text(
+                        remember(selectedDateMillis) {
+                            "Date:\n" + formatMillisToDateString(
+                                selectedDateMillis
                             )
-                            viewModel.saveReminder(updatedReminder)
-                            onConfirm()
                         },
-                        enabled = !loading,
-                        modifier = Modifier.weight(0.40f)
-                    ) {
-                        Text("CONFIRM")
-                    }
+                        modifier = Modifier.sizeIn(minWidth = 96.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        showTimePickDialog = true
+                    }, enabled = !loading, contentPadding = PaddingValues(32.dp)
+                ) {
+                    Text(
+                        "Time:\n" + "%02d:%02d".format(
+                            selectedTime.first, selectedTime.second
+                        ),
+                        modifier = Modifier.sizeIn(minWidth = 96.dp),
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
 
-            if (showDatePickDialog) {
-                DatePickerDialog(onDateSelected = {
-                    selectedDateMillis = it
-                }, onDismiss = {
-                    showDatePickDialog = false
-                })
-            } else {
-                if (showTimePickDialog) TimePickerDialog(
-                    onTimeSelected = {
-                        selectedTime = it
-                    }, onDismiss = {
-                        showTimePickDialog = false
-                    }, timeSelectableFrom = timeSelectableFrom
-                )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                TextButton(onClick = onBack, modifier = Modifier.weight(0.40f)) {
+                    Text("BACK")
+                }
+
+                TextButton(
+                    onClick = {
+                        val updatedReminder = Reminder(
+                            id = reminder?.id ?: 0,
+                            title = title,
+                            description = description,
+                            remindAt = LocalDateTime.ofInstant(
+                                combineDateAndTime(
+                                    selectedDateMillis,
+                                    selectedTime.first,
+                                    selectedTime.second
+                                ),
+                                ZoneId.systemDefault()
+                            ),
+                            isCompleted = false,
+                            repeatDailyFrom = null,
+                            repeatDailyTo = null
+                        )
+                        viewModel.saveReminder(updatedReminder)
+                        onConfirm()
+                    },
+                    enabled = !loading,
+                    modifier = Modifier.weight(0.40f)
+                ) {
+                    Text("CONFIRM")
+                }
             }
+        }
+
+        if (showDatePickDialog) {
+            DatePickerDialog(onDateSelected = {
+                selectedDateMillis = it
+            }, onDismiss = {
+                showDatePickDialog = false
+            })
+        } else {
+            if (showTimePickDialog) TimePickerDialog(
+                onTimeSelected = {
+                    selectedTime = it
+                }, onDismiss = {
+                    showTimePickDialog = false
+                }, timeSelectableFrom = timeSelectableFrom
+            )
         }
     }
 }

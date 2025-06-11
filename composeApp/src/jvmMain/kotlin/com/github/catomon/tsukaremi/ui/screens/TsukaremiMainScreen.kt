@@ -56,8 +56,8 @@ fun TsukaremiMainScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "つかれみ",
-                fontSize = 24.sp,
+                text = "Tsukaremi",
+                fontSize = 16.sp,
                 modifier = Modifier.clip(RoundedCornerShape(8.dp)).clickable {
                     navController.navigate(ListDestination)
                 })

@@ -30,19 +30,20 @@ fun Modifier.luckyWindowDecoration(): Modifier {
     val glowColor = MaterialTheme.colorScheme.surface.darken(0.8f)
     return if (WindowConfig.isTransparent)
         this.padding(8.dp).customShadow().drawBehind {
+            val radDp = with(density) { 12.dp.toPx() }
             drawRoundRect(
                 color = glowColor,
                 topLeft = Offset(0f, -2f),
                 size = this.size.copy(),
-                cornerRadius = CornerRadius(12f)
+                cornerRadius = CornerRadius(radDp)
             )
             drawRoundRect(
                 color = shadowColor,
                 topLeft = Offset(0f, with(density) { 2.dp.toPx() }),
                 size = this.size.copy(),
-                cornerRadius = CornerRadius(12f)
+                cornerRadius = CornerRadius(radDp)
             )
-        }.clip(RoundedCornerShape(12.dp))
+        }.clip(RoundedCornerShape(8.dp))
     else
         this.blurredShadow(cornerRadius = 0.dp)
             .border(
