@@ -116,10 +116,10 @@ fun ReminderListItem(
             .alpha(if (reminder.isCompleted) 0.75f else 1f)
     ) {
         Text(reminder.title)
-        Text(reminder.description)
+        Text(reminder.description, fontSize = 12.sp)
         Spacer(Modifier.weight(1f))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(reminder.remindAt.toString())
+            Text(reminder.remindAt.toString(), fontSize = 12.sp)
             TextButton({
                 onRemove(reminder)
             }, shape = CircleShape) {

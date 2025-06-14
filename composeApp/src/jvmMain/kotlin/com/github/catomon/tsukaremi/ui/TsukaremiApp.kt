@@ -16,7 +16,6 @@ import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberTrayState
-import androidx.compose.ui.window.rememberWindowState
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewModelScope
@@ -26,6 +25,7 @@ import com.github.catomon.tsukaremi.ui.viewmodel.MainViewModel
 import com.github.catomon.tsukaremi.ui.windows.ReminderWindow
 import com.github.catomon.tsukaremi.ui.windows.TsukaremiMainWindow
 import com.github.catomon.tsukaremi.ui.windows.WindowConfig
+import com.github.catomon.tsukaremi.util.isNotificationAllowed
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
@@ -59,8 +59,14 @@ fun ApplicationScope.TsukaremiApp() =
 //                    )
 //                )
 
-                    lastReminder = reminder
-                    shownReminders += reminder
+                    if (isNotificationAllowed()) {
+                        lastReminder = reminder
+                        shownReminders += reminder
+
+                        val lastThree = shownReminders.takeLast(3)
+                        shownReminders.clear()
+                        shownReminders += lastThree
+                    }
                 }
             }
         }

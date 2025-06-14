@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -19,7 +21,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
@@ -27,13 +32,12 @@ import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.modifiers.luckyWindowDecoration
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.ui.util.playSound
+import com.github.catomon.tsukaremi.util.canAlwaysOnTop
 import com.github.catomon.tsukaremi.util.epochMillisToSimpleDate
 import com.github.panpf.sketch.AsyncImage
-import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
 
 @Composable
 fun ReminderWindow(
@@ -47,7 +51,7 @@ fun ReminderWindow(
         onCloseRequest = onDismiss,
         undecorated = true,
         transparent = true,
-        alwaysOnTop = false,
+        alwaysOnTop = canAlwaysOnTop(),
         resizable = false
     ) {
         window.focusableWindowState = false
@@ -73,26 +77,43 @@ private fun ReminderWindowContent(
     Row {
         AsyncImage("assets/c29282c9a734ccddb8a40b2f9eda555c.gif", contentDescription = null)
 
-        Column(Modifier.background(MaterialTheme.colorScheme.background.copy(0.9f)).padding(horizontal = 6.dp)) {
-            Text(reminder.title)
-            Text(reminder.description)
+        Column(
+            Modifier.background(MaterialTheme.colorScheme.background.copy(0.9f)).weight(1f).padding(horizontal = 6.dp)
+        ) {
+            Text(
+                reminder.title,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+            Text(
+                reminder.description,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 3,
+                fontSize = 12.sp,
+                lineHeight = 20.sp
+            )
             Spacer(Modifier.weight(1f))
             Box(Modifier.fillMaxWidth()) {
-                Text(remember {
-                    epochMillisToSimpleDate(run {
-                        val remindAt: LocalDateTime = reminder.remindAt
-                        val zoneId = ZoneId.systemDefault()
-                        val zonedDateTime = remindAt.atZone(zoneId)
-                        val offset: ZoneOffset = zonedDateTime.offset
-                        remindAt.toEpochSecond(offset) * 1000
-                    })
-                }, modifier = Modifier.align(Alignment.BottomStart))
-                TextButton({
-                    onDismiss()
-                }, modifier = Modifier.align(Alignment.BottomEnd)) {
-                    Text("X")
-                }
+                Text(
+                    remember {
+                        epochMillisToSimpleDate(run {
+                            val remindAt: LocalDateTime = reminder.remindAt
+                            val zoneId = ZoneId.systemDefault()
+                            val zonedDateTime = remindAt.atZone(zoneId)
+                            val offset: ZoneOffset = zonedDateTime.offset
+                            remindAt.toEpochSecond(offset) * 1000
+                        })
+                    }, modifier = Modifier.align(Alignment.BottomStart),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1, fontSize = 12.sp
+                )
             }
+        }
+
+        TextButton({
+            onDismiss()
+        }, modifier = Modifier.fillMaxHeight().width(24.dp)) {
+            Text("X")
         }
     }
 }
