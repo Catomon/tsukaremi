@@ -15,7 +15,7 @@ kotlinx-serialization = "1.8.1"
 coil = "3.2.0"
 room = "2.7.1"
 ksp = "2.1.21-2.0.1"
-kstore = "0.9.1"
+kstore = "1.0.0"
 sqlite = "2.5.1"
 
 [libraries]
@@ -48,8 +48,9 @@ coil = { module = "io.coil-kt.coil3:coil-compose-core", version.ref = "coil" }
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite" }
+kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
+kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
 
 [plugins]
 

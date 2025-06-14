@@ -26,20 +26,20 @@ import org.jetbrains.skia.MaskFilter
 @Composable
 fun Modifier.luckyWindowDecoration(): Modifier {
     val density = LocalDensity.current
-    val shadowColor = MaterialTheme.colorScheme.surface.darken(0.8f)
-    val glowColor = MaterialTheme.colorScheme.surface.darken(0.8f)
+    val shadowColor = MaterialTheme.colorScheme.background.darken(0.7f)
+    val glowColor = MaterialTheme.colorScheme.surfaceContainerLow
     return if (WindowConfig.isTransparent)
         this.padding(8.dp).customShadow().drawBehind {
             val radDp = with(density) { 12.dp.toPx() }
-            drawRoundRect(
-                color = glowColor,
-                topLeft = Offset(0f, -2f),
-                size = this.size.copy(),
-                cornerRadius = CornerRadius(radDp)
-            )
+//            drawRoundRect(
+//                color = glowColor,
+//                topLeft = Offset(0f, -2f),
+//                size = this.size.copy(),
+//                cornerRadius = CornerRadius(radDp)
+//            )
             drawRoundRect(
                 color = shadowColor,
-                topLeft = Offset(0f, with(density) { 2.dp.toPx() }),
+                topLeft = Offset(0f, with(density) { 5.dp.toPx() }),
                 size = this.size.copy(),
                 cornerRadius = CornerRadius(radDp)
             )

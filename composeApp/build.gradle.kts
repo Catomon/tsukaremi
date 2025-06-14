@@ -51,8 +51,20 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.viewmodel.navigation)
 
+            implementation(libs.kstore)
+            implementation(libs.kstore.file)
+
 //            implementation("io.insert-koin:koin-ktor:$koin_ktor")
 //            implementation("io.insert-koin:koin-logger-slf4j:$koin_ktor")
+
+            // Provides the core functions of Sketch as well as singletons and extension
+// functions that rely on singleton implementations
+            val LAST_VERSION = "4.1.0"
+            implementation("io.github.panpf.sketch4:sketch-compose:${LAST_VERSION}")
+
+// Provides the ability to load network images
+            implementation("io.github.panpf.sketch4:sketch-http:${LAST_VERSION}")
+            implementation("io.github.panpf.sketch4:sketch-animated-gif:${LAST_VERSION}")
         }
 
         commonTest.dependencies {
@@ -94,15 +106,33 @@ android {
     }
 }
 
+composeCompiler {
+    stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
+}
+
 //https://developer.android.com/develop/ui/compose/testing#setup
 dependencies {
     androidTestImplementation(libs.androidx.uitest.junit4)
     debugImplementation(libs.androidx.uitest.testManifest)
 }
 
+tasks.register<Copy>("copyDesktopResources") {
+    from("assets")
+    into("$buildDir/processedResources/assets")
+}
+
+tasks.named("jvmProcessResources") {
+    dependsOn("copyDesktopResources")
+}
+
 compose.desktop {
     application {
         mainClass = "MainKt"
+
+        //proguard
+        //# -------------------------- Sketch Privider ---------------------------- #
+        //-keep class * implements com.github.panpf.sketch.util.DecoderProvider { *; }
+        //-keep class * implements com.github.panpf.sketch.util.FetcherProvider { *; }
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
