@@ -12,7 +12,7 @@ data class ReminderEntity(
     val title: String,
     val description: String,
     val remindAt: LocalDateTime,
+    val remindIn: Long,
+    val isTimer: Boolean,
     val isCompleted: Boolean,
-    val repeatDailyFrom: LocalTime?,
-    val repeatDailyTo: LocalTime?
 )

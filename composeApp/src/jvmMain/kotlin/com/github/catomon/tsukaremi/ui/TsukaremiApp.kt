@@ -101,6 +101,10 @@ fun ApplicationScope.TsukaremiApp() =
                                 )
                             )
                         },
+                        onRestart = {
+                            viewModel.restartReminder(reminder)
+                            shownReminders -= reminder
+                        },
                         onDismiss = {
                             shownReminders -= reminder
                         }

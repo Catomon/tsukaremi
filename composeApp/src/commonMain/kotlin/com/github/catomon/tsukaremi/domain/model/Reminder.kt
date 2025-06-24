@@ -13,9 +13,7 @@ data class Reminder(
     val description: String,
     @Serializable(with = LocalDateTimeSerializer::class)
     val remindAt: LocalDateTime,
+    val remindIn: Long = 0,
+    val isTimer: Boolean = false,
     val isCompleted: Boolean = false,
-    @Serializable(with = LocalTimeSerializer::class)
-    val repeatDailyFrom: LocalTime? = null,
-    @Serializable(with = LocalTimeSerializer::class)
-    val repeatDailyTo: LocalTime? = null,
 )

@@ -1,7 +1,7 @@
 package com.github.catomon.tsukaremi.ui.screens
 
 import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -21,8 +20,6 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -36,7 +33,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.tsukaremi.domain.model.Reminder
+import com.github.catomon.tsukaremi.util.epochMillisToSimpleDate
 import kotlinx.serialization.Serializable
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 
 @Serializable
 object ListDestination
@@ -45,12 +46,13 @@ object ListDestination
 fun ListScreen(
     reminders: List<Reminder>,
     onCreateNew: () -> Unit,
+    onRestart: (Reminder) -> Unit,
     onDelete: (Reminder) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val (oldReminders, incomingReminders) = remember(reminders) {
         reminders.groupBy { it.isCompleted }
-            .let { (it[true]?.reversed() ?: emptyList()) to (it[false] ?: emptyList()) }
+            .let { (it[true]?.reversed() ?: emptyList()) to (it[false]?.reversed() ?: emptyList()) }
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier.fillMaxSize()) {
@@ -68,7 +70,7 @@ fun ListScreen(
 //                Text("つ", fontSize = 48.sp)
 //            }
 
-            ElevatedButton(onClick = onCreateNew) {
+            Button(onClick = onCreateNew) {
                 Text("New Reminder")
             }
         }
@@ -83,16 +85,16 @@ fun ListScreen(
                 modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))
             ) {
                 items(incomingReminders, key = { it.id }) {
-                    ReminderListItem(it, onDelete)
+                    ReminderListItem(it, onDelete, onRestart)
                 }
 
                 if (oldReminders.isNotEmpty()) {
                     item(Unit) {
-                        Text("- Old -", Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                        Text("Expired", Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
                     }
 
                     items(oldReminders, key = { it.id }) {
-                        ReminderListItem(it, onDelete)
+                        ReminderListItem(it, onDelete, onRestart)
                     }
                 }
             }
@@ -109,22 +111,49 @@ fun ListScreen(
 fun ReminderListItem(
     reminder: Reminder,
     onRemove: (Reminder) -> Unit,
+    onRestart: (Reminder) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    ElevatedCard(
-        modifier = modifier.fillMaxWidth().height(100.dp).padding(4.dp)
-            .alpha(if (reminder.isCompleted) 0.75f else 1f)
+    Row(
+        modifier = modifier.fillMaxWidth().height(100.dp).padding(4.dp).then(
+            if (reminder.isCompleted) Modifier.border(
+                3.dp, MaterialTheme.colorScheme.surfaceContainerLow.copy(0.5f),
+                RoundedCornerShape(8.dp)
+            ) else Modifier.border(
+                3.dp, MaterialTheme.colorScheme.surfaceContainerLow,
+                RoundedCornerShape(8.dp)
+            )
+        ).padding(8.dp)
+            .alpha(if (reminder.isCompleted) 0.75f else 1f),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(reminder.title)
-        Text(reminder.description, fontSize = 12.sp)
+        Column {
+            Text(reminder.title, maxLines = 1)
+            Text(reminder.description, fontSize = 12.sp, maxLines = 1)
+            Text(remember {
+                epochMillisToSimpleDate(run {
+                    val remindAt: LocalDateTime = reminder.remindAt
+                    val zoneId = ZoneId.systemDefault()
+                    val zonedDateTime = remindAt.atZone(zoneId)
+                    val offset: ZoneOffset = zonedDateTime.offset
+                    remindAt.toEpochSecond(offset) * 1000
+                })
+            }, fontSize = 12.sp, maxLines = 1)
+        }
+
         Spacer(Modifier.weight(1f))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(reminder.remindAt.toString(), fontSize = 12.sp)
+
+        if (reminder.isTimer)
             TextButton({
-                onRemove(reminder)
-            }, shape = CircleShape) {
-                Text("X")
+                onRestart(reminder)
+            }, modifier = Modifier) {
+                Text("🔁", modifier = Modifier)
             }
+
+        TextButton({
+            onRemove(reminder)
+        }, shape = CircleShape) {
+            Text("X")
         }
     }
 }

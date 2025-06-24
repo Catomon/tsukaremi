@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,7 +22,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,6 +42,7 @@ import java.time.ZoneOffset
 @Composable
 fun ReminderWindow(
     reminder: Reminder,
+    onRestart: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     state: WindowState = rememberWindowState(size = WindowConfig.reminderWindowSize)
@@ -58,7 +59,7 @@ fun ReminderWindow(
         window.isFocusable = false
 
         TsukaremiTheme {
-            ReminderWindowContent(reminder, onDismiss, modifier.fillMaxSize())
+            ReminderWindowContent(reminder, onRestart, onDismiss, modifier.fillMaxSize())
         }
     }
 }
@@ -66,6 +67,7 @@ fun ReminderWindow(
 @Composable
 private fun ReminderWindowContent(
     reminder: Reminder,
+    onRestart: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) = Surface(modifier.luckyWindowDecoration()) {
@@ -110,29 +112,13 @@ private fun ReminderWindowContent(
             }
         }
 
-        TextButton({
-            onDismiss()
-        }, modifier = Modifier.fillMaxHeight().width(24.dp)) {
-            Text("X")
+        if (reminder.isTimer)
+            TextButton(onRestart, modifier = Modifier.fillMaxHeight().width(24.dp)) {
+                Text("🔁", modifier = Modifier.offset((-8).dp))
+            }
+
+        TextButton(onDismiss, modifier = Modifier.fillMaxHeight().width(24.dp)) {
+            Text("X", modifier = Modifier.offset((-4).dp))
         }
-    }
-}
-
-@Preview
-@Composable
-fun ReminderWindowPreview() {
-    TsukaremiTheme {
-        ReminderWindowContent(
-            Reminder(
-                id = 0,
-                title = "title",
-                description = "description",
-                remindAt = LocalDateTime.now()
-            ),
-            onDismiss = {
-
-            },
-            modifier = Modifier.size(WindowConfig.reminderWindowSize),
-        )
     }
 }

@@ -25,7 +25,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.io.files.Path
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 class MainViewModel(
     val repository: RemindersRepository,
@@ -110,6 +112,19 @@ class MainViewModel(
             repository.updateReminder(reminder.copy(isCompleted = true))
             this@MainViewModel.logMsg("Reminder updated: $reminder")
             _reminderEvents.tryEmit(reminder)
+        }
+    }
+
+    fun restartReminder(reminder: Reminder) {
+        viewModelScope.launch {
+            repository.updateReminder(reminder.copy(
+                isCompleted = false,
+                remindAt = run {
+                    val instant = Instant.ofEpochMilli(System.currentTimeMillis() + reminder.remindIn)
+                    val zoneId = ZoneId.systemDefault()
+                    instant.atZone(zoneId).toLocalDateTime()
+                }
+            ))
         }
     }
 }

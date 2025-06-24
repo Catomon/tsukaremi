@@ -1,6 +1,5 @@
 package com.github.catomon.tsukaremi.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,12 +9,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,13 +55,15 @@ fun EditScreen(
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 
+    var isTimer by remember(reminder) { mutableStateOf(reminder?.isTimer == true) }
+
     var showDatePickDialog by remember { mutableStateOf(false) }
     var showTimePickDialog by remember { mutableStateOf(false) }
 
     var selectedDateMillis by remember { mutableStateOf(System.currentTimeMillis()) }
-    var selectedTime by remember { mutableStateOf(LocalTime.now().let { it.hour to it.minute }) }
+    var selectedTime by remember(isTimer) { mutableStateOf(if (isTimer) 0 to 0 else LocalTime.now().let { it.hour to it.minute }) }
 
-    val timeSelectableFrom = remember(selectedDateMillis, selectedTime) {
+    val timeSelectableFrom = remember(selectedTime, selectedDateMillis) {
         getTimeSelectableFromDate(selectedDateMillis)
     }
 
@@ -69,11 +71,11 @@ fun EditScreen(
 
     Box(modifier = modifier.fillMaxSize()) {
         Column {
-            TextField(
+            OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
                 label = { Text("Title") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(4.dp),
                 enabled = !loading,
                 colors = TextFieldDefaults.colors(
                     unfocusedTextColor = Color.White,
@@ -84,16 +86,17 @@ fun EditScreen(
                     errorContainerColor = Color.Transparent,
 //                    unfocusedLabelColor = YukiTheme.colors.surface,
 //                    focusedLabelColor = YukiTheme.colors.surface,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent
-                )
+//                    unfocusedIndicatorColor = Color.Transparent,
+//                    focusedIndicatorColor = Color.Transparent
+                ),
+                maxLines = 1
             )
 
-            TextField(
+            OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text("Description") },
-                modifier = Modifier.fillMaxWidth().height(100.dp),
+                modifier = Modifier.fillMaxWidth().weight(1f).padding(4.dp),
                 enabled = !loading,
                 colors = TextFieldDefaults.colors(
                     unfocusedTextColor = Color.White,
@@ -104,33 +107,50 @@ fun EditScreen(
                     errorContainerColor = Color.Transparent,
 //                    unfocusedLabelColor = YukiTheme.colors.surface,
 //                    focusedLabelColor = YukiTheme.colors.surface,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent
+//                    unfocusedIndicatorColor = Color.Transparent,
+//                    focusedIndicatorColor = Color.Transparent
                 )
             )
 
-            Spacer(Modifier.weight(1f))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(Modifier.height(1.dp).weight(0.2f))
+
+                Text("Alarm")
+                RadioButton(!isTimer, onClick = {
+                    isTimer = false
+                })
+
+                Spacer(Modifier.height(1.dp).weight(0.2f))
+
+                Text("Timer")
+                RadioButton(isTimer, onClick = {
+                    isTimer = true
+                })
+
+                Spacer(Modifier.height(1.dp).weight(0.2f))
+            }
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Button(
-                    onClick = {
-                        showDatePickDialog = true
-                    }, enabled = !loading, contentPadding = PaddingValues(32.dp)
-                ) {
-                    Text(
-                        remember(selectedDateMillis) {
-                            "Date:\n" + formatMillisToDateString(
-                                selectedDateMillis
-                            )
-                        },
-                        modifier = Modifier.sizeIn(minWidth = 96.dp),
-                        textAlign = TextAlign.Center
-                    )
-                }
+                if (!isTimer)
+                    Button(
+                        onClick = {
+                            showDatePickDialog = true
+                        }, enabled = !loading, contentPadding = PaddingValues(32.dp)
+                    ) {
+                        Text(
+                            remember(selectedDateMillis) {
+                                "Date:\n" + formatMillisToDateString(
+                                    selectedDateMillis
+                                )
+                            },
+                            modifier = Modifier.sizeIn(minWidth = 96.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
 
                 Button(
                     onClick = {
@@ -138,9 +158,15 @@ fun EditScreen(
                     }, enabled = !loading, contentPadding = PaddingValues(32.dp)
                 ) {
                     Text(
-                        "Time:\n" + "%02d:%02d".format(
-                            selectedTime.first, selectedTime.second
-                        ),
+                        remember(isTimer, selectedTime) {
+                            "Time:\n" + "%02d:%02d".format(
+                                selectedTime.first, selectedTime.second
+                            )
+//
+//                            if (isTimer) "Time:\n00:00" else "Time:\n" + "%02d:%02d".format(
+//                                selectedTime.first, selectedTime.second
+//                            )
+                        },
                         modifier = Modifier.sizeIn(minWidth = 96.dp),
                         textAlign = TextAlign.Center
                     )
@@ -158,21 +184,30 @@ fun EditScreen(
 
                 TextButton(
                     onClick = {
-                        val updatedReminder = Reminder(
-                            id = reminder?.id ?: 0,
-                            title = title,
-                            description = description,
-                            remindAt = LocalDateTime.ofInstant(
+                        val remindIn = selectedTime.first * 60L * 60L * 1000L + selectedTime.second * 60L * 1000L
+                        val remindAt = if (isTimer) {
+                            val instant = Instant.ofEpochMilli(System.currentTimeMillis() + remindIn)
+                            val zoneId = ZoneId.systemDefault()
+                            instant.atZone(zoneId).toLocalDateTime()
+                        } else {
+                            LocalDateTime.ofInstant(
                                 combineDateAndTime(
                                     selectedDateMillis,
                                     selectedTime.first,
                                     selectedTime.second
                                 ),
                                 ZoneId.systemDefault()
-                            ),
+                            )
+                        }
+
+                        val updatedReminder = Reminder(
+                            id = reminder?.id ?: 0,
+                            title = title,
+                            description = description,
+                            remindAt = remindAt,
+                            remindIn = remindIn,
                             isCompleted = false,
-                            repeatDailyFrom = null,
-                            repeatDailyTo = null
+                            isTimer = isTimer
                         )
                         viewModel.saveReminder(updatedReminder)
                         onConfirm()
@@ -197,7 +232,9 @@ fun EditScreen(
                     selectedTime = it
                 }, onDismiss = {
                     showTimePickDialog = false
-                }, timeSelectableFrom = timeSelectableFrom
+                },
+                time = remember(isTimer) { if (isTimer) 0 to 0 else LocalTime.now().let { it.hour to it.second } },
+                timeSelectableFrom = if (isTimer) 0 to 0 else timeSelectableFrom
             )
         }
     }

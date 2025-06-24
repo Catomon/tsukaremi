@@ -28,12 +28,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.components.LuckySurface
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalNavController
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalWindow
 import com.github.catomon.tsukaremi.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
+import java.time.Instant
+import java.time.ZoneId
 import kotlin.system.exitProcess
 
 @Composable
@@ -79,6 +82,9 @@ fun TsukaremiMainScreen(
                     ListScreen(
                         reminders = reminders, onCreateNew = {
                             navController.navigate(EditDestination())
+                        },
+                        onRestart = {
+                           viewModel.restartReminder(it)
                         },
                         onDelete = {
                             viewModel.viewModelScope.launch {

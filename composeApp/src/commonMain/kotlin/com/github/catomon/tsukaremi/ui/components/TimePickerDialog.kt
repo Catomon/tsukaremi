@@ -28,12 +28,12 @@ import java.time.LocalTime
 fun TimePickerDialog(
     onTimeSelected: (Pair<Int, Int>) -> Unit,
     onDismiss: () -> Unit,
+    time: Pair<Int, Int> = remember { LocalTime.now().let { it.hour to it.second } },
     timeSelectableFrom: Pair<Int, Int>? = null
 ) {
-    val currentDayTime = LocalTime.now()
     val timePickerState = rememberTimePickerState(
-        currentDayTime.hour,
-        currentDayTime.minute,
+        time.first,
+        time.second,
         DateFormat.getTimeInstance().is24HrFormat()
     )
 

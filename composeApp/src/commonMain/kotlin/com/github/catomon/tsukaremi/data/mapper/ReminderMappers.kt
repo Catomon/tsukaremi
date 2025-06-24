@@ -8,9 +8,9 @@ fun Reminder.toEntity() = ReminderEntity(
     title = this.title,
     description = this.description,
     remindAt = this.remindAt,
+    remindIn = this.remindIn,
+    isTimer = this.isTimer,
     isCompleted = this.isCompleted,
-    repeatDailyFrom = this.repeatDailyFrom,
-    repeatDailyTo = this.repeatDailyTo
 )
 
 fun ReminderEntity.toDomain() = Reminder(
@@ -18,7 +18,7 @@ fun ReminderEntity.toDomain() = Reminder(
     title = this.title,
     description = this.description,
     remindAt = this.remindAt,
+    remindIn = this.remindIn,
+    isTimer = this.isTimer,
     isCompleted = this.isCompleted,
-    repeatDailyFrom = this.repeatDailyFrom,
-    repeatDailyTo = this.repeatDailyTo
 )
