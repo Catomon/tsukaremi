@@ -1,5 +1,7 @@
 package com.github.catomon.tsukaremi.ui.screens
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,15 +27,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.util.epochMillisToSimpleDate
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -46,6 +51,7 @@ object ListDestination
 fun ListScreen(
     reminders: List<Reminder>,
     onCreateNew: () -> Unit,
+    onEdit: (Reminder) -> Unit,
     onRestart: (Reminder) -> Unit,
     onDelete: (Reminder) -> Unit,
     modifier: Modifier = Modifier
@@ -85,7 +91,7 @@ fun ListScreen(
                 modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))
             ) {
                 items(incomingReminders, key = { it.id }) {
-                    ReminderListItem(it, onDelete, onRestart)
+                    ReminderListItem(it, onEdit, onDelete, onRestart)
                 }
 
                 if (oldReminders.isNotEmpty()) {
@@ -94,7 +100,7 @@ fun ListScreen(
                     }
 
                     items(oldReminders, key = { it.id }) {
-                        ReminderListItem(it, onDelete, onRestart)
+                        ReminderListItem(it, onEdit, onDelete, onRestart)
                     }
                 }
             }
@@ -110,10 +116,13 @@ fun ListScreen(
 @Composable
 fun ReminderListItem(
     reminder: Reminder,
+    onEdit: (Reminder) -> Unit,
     onRemove: (Reminder) -> Unit,
     onRestart: (Reminder) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     Row(
         modifier = modifier.fillMaxWidth().height(100.dp).padding(4.dp).then(
             if (reminder.isCompleted) Modifier.border(
@@ -130,7 +139,7 @@ fun ReminderListItem(
         Column {
             Text(reminder.title, maxLines = 1)
             Text(reminder.description, fontSize = 12.sp, maxLines = 1)
-            Text(remember {
+            Text(remember(reminder) {
                 epochMillisToSimpleDate(run {
                     val remindAt: LocalDateTime = reminder.remindAt
                     val zoneId = ZoneId.systemDefault()
@@ -143,10 +152,35 @@ fun ReminderListItem(
 
         Spacer(Modifier.weight(1f))
 
+        TextButton({
+            onEdit(reminder)
+        }, modifier = Modifier) {
+            Text("✏", modifier = Modifier)
+        }
+
+        val scale = remember { androidx.compose.animation.core.Animatable(1f) }
+
         if (reminder.isTimer)
             TextButton({
+                coroutineScope.launch {
+                    scale.animateTo(
+                        1.25f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessHigh
+                        )
+                    )
+
+                    scale.animateTo(
+                        1f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessHigh
+                        )
+                    )
+                }
                 onRestart(reminder)
-            }, modifier = Modifier) {
+            }, modifier = Modifier.scale(scale.value)) {
                 Text("🔁", modifier = Modifier)
             }
 

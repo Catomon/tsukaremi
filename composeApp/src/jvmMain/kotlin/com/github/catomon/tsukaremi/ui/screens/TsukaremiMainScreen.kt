@@ -28,6 +28,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.components.LuckySurface
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalNavController
@@ -83,6 +84,9 @@ fun TsukaremiMainScreen(
                         reminders = reminders, onCreateNew = {
                             navController.navigate(EditDestination())
                         },
+                        onEdit = {
+                            navController.navigate(EditDestination(it.id))
+                        },
                         onRestart = {
                            viewModel.restartReminder(it)
                         },
@@ -96,6 +100,7 @@ fun TsukaremiMainScreen(
 
                 composable<EditDestination> {
                     EditScreen(
+                        it.toRoute<EditDestination>().reminderId,
                         onBack = navController::navigateUp,
                         onConfirm = navController::navigateUp
                     )

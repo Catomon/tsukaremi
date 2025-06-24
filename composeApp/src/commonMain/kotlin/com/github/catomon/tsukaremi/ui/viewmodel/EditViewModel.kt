@@ -14,13 +14,15 @@ class EditViewModel(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val reminderId: Int? = savedStateHandle["reminderId"]
+    private var reminderId: Int? = savedStateHandle["reminderId"]
 
     var reminder = mutableStateOf<Reminder?>(null)
 
-    var loading = mutableStateOf(true)
+    var loading = mutableStateOf(false)
 
-    init {
+    fun loadReminder(id: Int) {
+        reminderId = id
+
         viewModelScope.launch {
             reminderId?.let { reminderId ->
                 repository.getReminderById(reminderId).collectLatest { latest ->

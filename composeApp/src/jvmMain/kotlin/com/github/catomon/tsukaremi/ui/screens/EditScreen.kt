@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,28 +47,47 @@ data class EditDestination(val reminderId: Int? = null)
 
 @Composable
 fun EditScreen(
-    viewModel: EditViewModel = koinViewModel(),
+    reminderId: Int? = null,
     onBack: () -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: EditViewModel = koinViewModel(),
 ) {
     val reminder by viewModel.reminder
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
+    var title by remember(reminder) { mutableStateOf(reminder?.title ?: "") }
+    var description by remember(reminder) { mutableStateOf(reminder?.title ?: "") }
 
     var isTimer by remember(reminder) { mutableStateOf(reminder?.isTimer == true) }
 
     var showDatePickDialog by remember { mutableStateOf(false) }
     var showTimePickDialog by remember { mutableStateOf(false) }
 
-    var selectedDateMillis by remember { mutableStateOf(System.currentTimeMillis()) }
-    var selectedTime by remember(isTimer) { mutableStateOf(if (isTimer) 0 to 0 else LocalTime.now().let { it.hour to it.minute }) }
+    var selectedDateMillis by remember(reminder) {
+        mutableStateOf(
+            reminder?.remindAt?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
+                ?: System.currentTimeMillis()
+        )
+    }
+    var selectedTime by remember(isTimer, reminder) {
+        mutableStateOf(
+            if (isTimer) reminder?.remindIn?.let {
+                val mnsTotal = it / 1000 / 60
+                val hrs = mnsTotal / 60
+                val mns = mnsTotal - hrs * 60
+                hrs.toInt() to mns.toInt()
+            } ?: (0 to 0) else reminder?.remindAt?.let { it.hour to it.minute } ?: LocalTime.now()
+                .let { it.hour to it.minute })
+    }
 
-    val timeSelectableFrom = remember(selectedTime, selectedDateMillis) {
+    val timeSelectableFrom = remember(selectedTime, selectedDateMillis, reminder) {
         getTimeSelectableFromDate(selectedDateMillis)
     }
 
     val loading by viewModel.loading
+
+    LaunchedEffect(Unit) {
+        viewModel.loadReminder(reminderId ?: return@LaunchedEffect)
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         Column {
@@ -116,16 +136,24 @@ fun EditScreen(
                 Spacer(Modifier.height(1.dp).weight(0.2f))
 
                 Text("Alarm")
-                RadioButton(!isTimer, onClick = {
-                    isTimer = false
-                })
+                RadioButton(
+                    !isTimer,
+                    onClick = {
+                        isTimer = false
+                    },
+                    enabled = !loading,
+                )
 
                 Spacer(Modifier.height(1.dp).weight(0.2f))
 
                 Text("Timer")
-                RadioButton(isTimer, onClick = {
-                    isTimer = true
-                })
+                RadioButton(
+                    isTimer,
+                    onClick = {
+                        isTimer = true
+                    },
+                    enabled = !loading,
+                )
 
                 Spacer(Modifier.height(1.dp).weight(0.2f))
             }
