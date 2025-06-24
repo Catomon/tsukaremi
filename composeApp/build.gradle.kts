@@ -132,15 +132,17 @@ compose.desktop {
     application {
         mainClass = "MainKt"
 
-        //proguard
-        //# -------------------------- Sketch Privider ---------------------------- #
-        //-keep class * implements com.github.panpf.sketch.util.DecoderProvider { *; }
-        //-keep class * implements com.github.panpf.sketch.util.FetcherProvider { *; }
-
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Tsukaremi"
             packageVersion = "1.0.0"
+
+            buildTypes.release.proguard {
+                configurationFiles.from(project.file("compose-desktop.pro"))
+                isEnabled = true
+                optimize = true
+                obfuscate = false
+            }
 
             linux {
                 iconFile.set(project.file("desktopAppIcons/LinuxIcon.png"))
