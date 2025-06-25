@@ -34,16 +34,52 @@ import com.github.catomon.tsukaremi.ui.components.TimePickerDialog
 import com.github.catomon.tsukaremi.ui.viewmodel.EditViewModel
 import com.github.catomon.tsukaremi.util.combineDateAndTime
 import com.github.catomon.tsukaremi.util.formatMillisToDateString
+import com.github.catomon.tsukaremi.util.is24HrFormat
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
+import java.text.DateFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 
+typealias HoursMinutes = Pair<Int, Int>
+
 @Serializable
 data class EditDestination(val reminderId: Int? = null)
+
+private val defaultTimerRemindInTime = 0 to 0
+
+fun HoursMinutes.decrementTime(
+    decrement: Int,
+//    is24Hour: Boolean = DateFormat.getTimeInstance().is24HrFormat()
+): HoursMinutes {
+    var hrs = first
+    var mns = second - decrement
+//    val maxHour = if (is24Hour) 23 else 11
+
+    while (mns < 0) {
+        mns += 60
+        hrs -= 1
+        if (hrs < 0) {
+//            hrs = maxHour
+            hrs = 0
+            mns = 0
+        }
+    }
+    return HoursMinutes(hrs, mns % 60)
+}
+
+fun HoursMinutes.incrementTime(
+    increment: Int,
+//    is24Hour: Boolean = DateFormat.getTimeInstance().is24HrFormat()
+): HoursMinutes {
+    val mns = second + increment
+    var hrs = first + mns / 60
+//    if (hrs >= if (is24Hour) 24 else 12) hrs = 0
+    return HoursMinutes(hrs, mns % 60)
+}
 
 @Composable
 fun EditScreen(
@@ -55,7 +91,7 @@ fun EditScreen(
 ) {
     val reminder by viewModel.reminder
     var title by remember(reminder) { mutableStateOf(reminder?.title ?: "") }
-    var description by remember(reminder) { mutableStateOf(reminder?.title ?: "") }
+    var description by remember(reminder) { mutableStateOf(reminder?.description ?: "") }
 
     var isTimer by remember(reminder) { mutableStateOf(reminder?.isTimer == true) }
 
@@ -75,7 +111,7 @@ fun EditScreen(
                 val hrs = mnsTotal / 60
                 val mns = mnsTotal - hrs * 60
                 hrs.toInt() to mns.toInt()
-            } ?: (0 to 0) else reminder?.remindAt?.let { it.hour to it.minute } ?: LocalTime.now()
+            } ?: (defaultTimerRemindInTime) else reminder?.remindAt?.let { it.hour to it.minute } ?: LocalTime.now()
                 .let { it.hour to it.minute })
     }
 
@@ -161,7 +197,7 @@ fun EditScreen(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().height(150.dp)
             ) {
                 if (!isTimer)
                     Button(
@@ -180,6 +216,27 @@ fun EditScreen(
                         )
                     }
 
+                if (isTimer)
+                    Column {
+                        Button({
+                            selectedTime = selectedTime.decrementTime(1)
+                        }, enabled = !loading) {
+                            Text("-1")
+                        }
+
+                        Button({
+                            selectedTime = selectedTime.decrementTime(5)
+                        }, enabled = !loading) {
+                            Text("-5")
+                        }
+
+                        Button({
+                            selectedTime = selectedTime.decrementTime(30)
+                        }, enabled = !loading) {
+                            Text("-30")
+                        }
+                    }
+
                 Button(
                     onClick = {
                         showTimePickDialog = true
@@ -187,18 +244,37 @@ fun EditScreen(
                 ) {
                     Text(
                         remember(isTimer, selectedTime) {
-                            "Time:\n" + "%02d:%02d".format(
+                            if (isTimer) "Remind in:\n" + "%02d:%02d:00".format(
+                                selectedTime.first, selectedTime.second
+                            ) else "Time:\n" + "%02d:%02d".format(
                                 selectedTime.first, selectedTime.second
                             )
-//
-//                            if (isTimer) "Time:\n00:00" else "Time:\n" + "%02d:%02d".format(
-//                                selectedTime.first, selectedTime.second
-//                            )
                         },
                         modifier = Modifier.sizeIn(minWidth = 96.dp),
                         textAlign = TextAlign.Center
                     )
                 }
+
+                if (isTimer)
+                    Column {
+                        Button({
+                            selectedTime = selectedTime.incrementTime(1)
+                        }, enabled = !loading) {
+                            Text("+1")
+                        }
+
+                        Button({
+                            selectedTime = selectedTime.incrementTime(5)
+                        }, enabled = !loading) {
+                            Text("+5")
+                        }
+
+                        Button({
+                            selectedTime = selectedTime.incrementTime(30)
+                        }, enabled = !loading) {
+                            Text("+30")
+                        }
+                    }
             }
 
             Row(
@@ -261,8 +337,10 @@ fun EditScreen(
                 }, onDismiss = {
                     showTimePickDialog = false
                 },
-                time = remember(isTimer) { if (isTimer) 0 to 0 else LocalTime.now().let { it.hour to it.second } },
-                timeSelectableFrom = if (isTimer) 0 to 0 else timeSelectableFrom
+                time = remember(isTimer) {
+                    if (isTimer) defaultTimerRemindInTime else LocalTime.now().let { it.hour to it.second }
+                },
+                timeSelectableFrom = if (isTimer) defaultTimerRemindInTime else timeSelectableFrom
             )
         }
     }

@@ -7,11 +7,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,15 +33,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.github.catomon.tsukaremi.domain.model.Reminder
-import com.github.catomon.tsukaremi.ui.components.LuckySurface
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalNavController
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalWindow
 import com.github.catomon.tsukaremi.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
-import java.time.Instant
-import java.time.ZoneId
+import tsukaremi.composeapp.generated.resources.Res
+import tsukaremi.composeapp.generated.resources.close_window
+import tsukaremi.composeapp.generated.resources.minimize_window
 import kotlin.system.exitProcess
 
 @Composable
@@ -67,10 +71,20 @@ fun TsukaremiMainScreen(
                     navController.navigate(ListDestination)
                 })
 
-            Text("---", modifier = Modifier.clickable {
+            Spacer(Modifier.height(1.dp).weight(1f))
+
+            IconButton({
                 window.isMinimized = true
-            })
-        } //つかれみ //ゆきのて //ツカレミ
+            }) {
+                Icon(painterResource(Res.drawable.minimize_window), "Minimize window", modifier = Modifier.size(20.dp))
+            }
+
+            IconButton({
+                exitApplication()
+            }) {
+                Icon(painterResource(Res.drawable.close_window), "Close window", modifier = Modifier.size(20.dp))
+            }
+        } //つかれみ //ツカレミ
 
         CompositionLocalProvider(LocalNavController provides navController) {
             NavHost(
@@ -88,7 +102,7 @@ fun TsukaremiMainScreen(
                             navController.navigate(EditDestination(it.id))
                         },
                         onRestart = {
-                           viewModel.restartReminder(it)
+                            viewModel.restartReminder(it)
                         },
                         onDelete = {
                             viewModel.viewModelScope.launch {

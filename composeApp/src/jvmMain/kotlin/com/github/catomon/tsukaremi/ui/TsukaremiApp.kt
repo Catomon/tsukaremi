@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import tsukaremi.composeapp.generated.resources.Res
-import tsukaremi.composeapp.generated.resources.ic_cyclone
+import tsukaremi.composeapp.generated.resources.app_icon
 import java.awt.Toolkit
 
 private val screenSize = Toolkit.getDefaultToolkit().screenSize
@@ -83,7 +83,7 @@ fun ApplicationScope.TsukaremiApp() =
             }
         }
 
-        Tray(icon = painterResource(Res.drawable.ic_cyclone), state = trayState)
+        Tray(icon = painterResource(Res.drawable.app_icon), state = trayState)
 
         TsukaremiMainWindow()
 
