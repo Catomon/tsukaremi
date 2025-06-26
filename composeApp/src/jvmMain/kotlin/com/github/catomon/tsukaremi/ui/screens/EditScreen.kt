@@ -43,6 +43,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 
 typealias HoursMinutes = Pair<Int, Int>
 
@@ -300,7 +301,7 @@ fun EditScreen(
                                     selectedTime.first,
                                     selectedTime.second
                                 ),
-                                ZoneId.systemDefault()
+                                ZoneOffset.UTC
                             )
                         }
 

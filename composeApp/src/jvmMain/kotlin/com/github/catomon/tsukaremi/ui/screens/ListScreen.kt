@@ -3,6 +3,8 @@ package com.github.catomon.tsukaremi.ui.screens
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -69,8 +71,8 @@ fun ListScreen(
     modifier: Modifier = Modifier
 ) {
     val (oldReminders, incomingReminders) = remember(reminders) {
-        reminders.groupBy { it.isCompleted }
-            .let { (it[true]?.reversed() ?: emptyList()) to (it[false]?.reversed() ?: emptyList()) }
+        reminders.sortedByDescending { it.remindAt.toInstant(ZoneOffset.UTC).epochSecond }.groupBy { it.isCompleted }
+            .let { (it[true] ?: emptyList()) to (it[false] ?: emptyList()) }
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier.fillMaxSize()) {
@@ -102,7 +104,7 @@ fun ListScreen(
                 // contentPadding = PaddingValues(2.dp),
                 modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))
             ) {
-                items(incomingReminders, key = { it.id }) {
+                items(incomingReminders) {
                     ReminderListItem(it, onEdit, onDelete, onRestart)
                 }
 
@@ -116,7 +118,7 @@ fun ListScreen(
                         )
                     }
 
-                    items(oldReminders, key = { it.id }) {
+                    items(oldReminders) {
                         ReminderListItem(it, onEdit, onDelete, onRestart)
                     }
                 }
@@ -169,10 +171,12 @@ fun ReminderListItem(
             }, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
 
-        AnimatedVisibility(isHovered.value, modifier = Modifier.align(Alignment.CenterEnd).background(
-            color = MaterialTheme.colorScheme.background,
-            shape = RoundedCornerShape(8.dp)
-        ).fillMaxHeight()) {
+        AnimatedVisibility(
+            isHovered.value, modifier = Modifier.align(Alignment.CenterEnd).background(
+                color = MaterialTheme.colorScheme.background,
+                shape = RoundedCornerShape(8.dp)
+            ).fillMaxHeight(), enter = fadeIn(), exit = fadeOut()
+        ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
