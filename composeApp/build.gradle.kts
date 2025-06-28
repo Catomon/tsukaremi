@@ -57,12 +57,9 @@ kotlin {
 //            implementation("io.insert-koin:koin-ktor:$koin_ktor")
 //            implementation("io.insert-koin:koin-logger-slf4j:$koin_ktor")
 
-            // Provides the core functions of Sketch as well as singletons and extension
-// functions that rely on singleton implementations
-            val LAST_VERSION = "4.1.0"
+            val LAST_VERSION = "4.2.0-beta01"
             implementation("io.github.panpf.sketch4:sketch-compose:${LAST_VERSION}")
 
-// Provides the ability to load network images
             implementation("io.github.panpf.sketch4:sketch-http:${LAST_VERSION}")
             implementation("io.github.panpf.sketch4:sketch-animated-gif:${LAST_VERSION}")
         }
@@ -79,6 +76,9 @@ kotlin {
             implementation(libs.androidx.activityCompose)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
+
+            implementation(libs.koin.android)
+//            implementation(libs.koin.androidx.navigation)
         }
 
         jvmMain.dependencies {
@@ -98,7 +98,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 26
         targetSdk = 35
 
         applicationId = "com.github.catomon.tsukaremi.androidApp"

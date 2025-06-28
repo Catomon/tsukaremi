@@ -1,15 +1,16 @@
 package com.github.catomon.tsukaremi.ui.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -26,7 +27,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -66,6 +66,7 @@ import java.time.ZoneOffset
 @Serializable
 object ListDestination
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ListScreen(
     reminders: List<Reminder>,
@@ -91,10 +92,14 @@ fun ListScreen(
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.matchParentSize().background(MaterialTheme.colorScheme.background.copy(0.75f))
+            modifier = Modifier
+                .matchParentSize()
+                .background(MaterialTheme.colorScheme.background.copy(0.75f))
         ) {
             Row(
-                Modifier.fillMaxWidth().padding(4.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center //SpaceBetween
             ) {
@@ -113,20 +118,21 @@ fun ListScreen(
             }
 
             val listState = rememberLazyListState()
-            val scrollbarAdapter = rememberScrollbarAdapter(listState)
 
             Box(contentAlignment = Alignment.Center) {
                 LazyColumn(
                     state = listState,
                     // contentPadding = PaddingValues(2.dp),
-                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(12.dp))
                 ) {
                     items(incomingReminders) {
                         ReminderListItem(it, onEdit, onDelete, onRestart)
                     }
 
                     if (oldReminders.isNotEmpty()) {
-                        item(Unit) {
+                        item(null) {
                             Text(
                                 "Expired",
                                 Modifier.fillMaxWidth(),
@@ -140,11 +146,6 @@ fun ListScreen(
                         }
                     }
                 }
-
-                VerticalScrollbar(
-                    adapter = scrollbarAdapter, modifier = Modifier.fillMaxHeight().align(
-                        Alignment.CenterEnd
-                    ).clickable { })
             }
         }
     }
@@ -163,16 +164,22 @@ fun ReminderListItem(
     val isHovered = interactionSource.collectIsHoveredAsState()
 
     Box(
-        modifier = modifier.fillMaxWidth().height(100.dp).padding(4.dp).then(
-            if (reminder.isCompleted) Modifier.border(
-                3.dp, MaterialTheme.colorScheme.surface.darken(0.75f),
-                RoundedCornerShape(8.dp)
-            ) else Modifier.border(
-                3.dp, MaterialTheme.colorScheme.surfaceContainerLow,
-                RoundedCornerShape(8.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .padding(4.dp)
+            .then(
+                if (reminder.isCompleted) Modifier.border(
+                    3.dp, MaterialTheme.colorScheme.surface.darken(0.75f),
+                    RoundedCornerShape(8.dp)
+                ) else Modifier.border(
+                    3.dp, MaterialTheme.colorScheme.surfaceContainerLow,
+                    RoundedCornerShape(8.dp)
+                )
             )
-        ).padding(8.dp)
-            .alpha(if (reminder.isCompleted) 0.75f else 1f).hoverable(interactionSource),
+            .padding(8.dp)
+            .alpha(if (reminder.isCompleted) 0.75f else 1f)
+            .hoverable(interactionSource),
         contentAlignment = Alignment.CenterStart
     ) {
         Column {
@@ -190,10 +197,13 @@ fun ReminderListItem(
         }
 
         AnimatedVisibility(
-            isHovered.value, modifier = Modifier.align(Alignment.CenterEnd).background(
-                color = MaterialTheme.colorScheme.background,
-                shape = RoundedCornerShape(8.dp)
-            ).fillMaxHeight(), enter = fadeIn(), exit = fadeOut()
+            isHovered.value, modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .fillMaxHeight(), enter = fadeIn(), exit = fadeOut()
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -204,7 +214,7 @@ fun ReminderListItem(
                     Icon(painterResource(Res.drawable.pencil), null, modifier = Modifier.size(20.dp))
                 }
 
-                val scale = remember { androidx.compose.animation.core.Animatable(1f) }
+                val scale = remember { Animatable(1f) }
 
                 if (reminder.isTimer)
                     IconButton({

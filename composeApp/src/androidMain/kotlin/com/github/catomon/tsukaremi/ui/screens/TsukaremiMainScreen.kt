@@ -1,5 +1,7 @@
 package com.github.catomon.tsukaremi.ui.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.clickable
@@ -32,23 +34,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalNavController
-import com.github.catomon.tsukaremi.ui.compositionlocals.LocalWindow
 import com.github.catomon.tsukaremi.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import tsukaremi.composeapp.generated.resources.Res
 import tsukaremi.composeapp.generated.resources.close_window
-import tsukaremi.composeapp.generated.resources.minimize_window
-import kotlin.system.exitProcess
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TsukaremiMainScreen(
     viewModel: MainViewModel = koinViewModel(),
-    exitApplication: () -> Unit = { exitProcess(0) },
     modifier: Modifier = Modifier
 ) = Surface(modifier = modifier) {
-    val window = LocalWindow.current
     val navController = rememberNavController()
     val reminders by viewModel.reminders.collectAsState()
 
@@ -58,29 +56,32 @@ fun TsukaremiMainScreen(
         verticalArrangement = Arrangement.Top
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp).height(32.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 6.dp)
+                .height(32.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = "Tsukaremi",
                 fontSize = 16.sp,
-                modifier = Modifier.clip(RoundedCornerShape(8.dp)).clickable {
-                    navController.navigate(ListDestination)
-                })
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable {
+                        navController.navigate(ListDestination)
+                    })
 
-            Spacer(Modifier.height(1.dp).weight(1f))
+            Spacer(
+                Modifier
+                    .height(1.dp)
+                    .weight(1f)
+            )
 
             IconButton({
-                window.isMinimized = true
-            }) {
-                Icon(painterResource(Res.drawable.minimize_window), "Minimize window", modifier = Modifier.size(20.dp))
-            }
 
-            IconButton({
-                exitApplication()
             }) {
-                Icon(painterResource(Res.drawable.close_window), "Close window", modifier = Modifier.size(20.dp))
+                Icon(painterResource(Res.drawable.close_window), "Options", modifier = Modifier.size(20.dp))
             }
         } //つかれみ //ツカレミ
 
@@ -117,14 +118,13 @@ fun TsukaremiMainScreen(
                     EditScreen(
                         it.toRoute<EditDestination>().reminderId,
                         onBack = navController::navigateUp,
-                        onConfirm = navController::navigateUp
+                        onConfirm = navController::navigateUp,
                     )
                 }
 
                 composable<SettingsDestination> {
                     SettingsScreen(
                         onBack = navController::navigateUp,
-                        onExitApp = exitApplication
                     )
                 }
             }

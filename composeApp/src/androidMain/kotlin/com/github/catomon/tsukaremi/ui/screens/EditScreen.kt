@@ -1,5 +1,7 @@
 package com.github.catomon.tsukaremi.ui.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,15 +84,18 @@ fun HoursMinutes.incrementTime(
     return HoursMinutes(hrs, mns % 60)
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EditScreen(
-    reminderId: Int? = null,
+    reminderId: Int?,
     onBack: () -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EditViewModel = koinViewModel(),
 ) {
     var isLoading by remember { mutableStateOf(false) }
+
+//    var reminderId: Int? by rememberSaveable { mutableStateOf(reminderId) }
 
     var reminder by remember { mutableStateOf<Reminder?>(null) }
     var title by remember(reminder) { mutableStateOf(reminder?.title ?: "") }
@@ -137,7 +143,9 @@ fun EditScreen(
                 value = title,
                 onValueChange = { title = it },
                 label = { Text("Title") },
-                modifier = Modifier.fillMaxWidth().padding(4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
                 enabled = !isLoading,
                 colors = TextFieldDefaults.colors(
                     unfocusedTextColor = Color.White,
@@ -158,7 +166,10 @@ fun EditScreen(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text("Description") },
-                modifier = Modifier.fillMaxWidth().weight(1f).padding(4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(4.dp),
                 enabled = !isLoading,
                 colors = TextFieldDefaults.colors(
                     unfocusedTextColor = Color.White,
@@ -175,7 +186,9 @@ fun EditScreen(
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Spacer(Modifier.height(1.dp).weight(0.2f))
+                Spacer(Modifier
+                    .height(1.dp)
+                    .weight(0.2f))
 
                 Text("Alarm")
                 RadioButton(
@@ -186,7 +199,9 @@ fun EditScreen(
                     enabled = !isLoading,
                 )
 
-                Spacer(Modifier.height(1.dp).weight(0.2f))
+                Spacer(Modifier
+                    .height(1.dp)
+                    .weight(0.2f))
 
                 Text("Timer")
                 RadioButton(
@@ -197,13 +212,17 @@ fun EditScreen(
                     enabled = !isLoading,
                 )
 
-                Spacer(Modifier.height(1.dp).weight(0.2f))
+                Spacer(Modifier
+                    .height(1.dp)
+                    .weight(0.2f))
             }
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth().height(150.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)
             ) {
                 if (!isTimer)
                     Button(
@@ -320,6 +339,7 @@ fun EditScreen(
                             isTimer = isTimer
                         )
                         viewModel.saveReminder(updatedReminder)
+
                         onConfirm()
                     },
                     enabled = !isLoading,

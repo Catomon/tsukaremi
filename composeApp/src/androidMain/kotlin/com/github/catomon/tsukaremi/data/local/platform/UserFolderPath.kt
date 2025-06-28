@@ -1,7 +1,7 @@
 package com.github.catomon.tsukaremi.data.local.platform
 
-import com.github.catomon.tsukaremi.AppActivity
-import com.github.catomon.tsukaremi.mainActivityContext
+import com.github.catomon.tsukaremi.TsukaremiApp
+import com.github.catomon.tsukaremi.appContext
 import java.io.File
 
-actual val userFolderPath: String = File((mainActivityContext as AppActivity).filesDir.toURI()).absolutePath
+actual val userFolderPath: String = File((appContext as TsukaremiApp).filesDir.toURI()).absolutePath

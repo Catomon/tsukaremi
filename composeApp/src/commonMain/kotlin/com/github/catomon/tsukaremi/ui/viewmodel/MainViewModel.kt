@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.catomon.tsukaremi.data.local.AppSettings
 import com.github.catomon.tsukaremi.data.local.platform.userFolderPath
+import com.github.catomon.tsukaremi.domain.ReminderService
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.domain.repository.RemindersRepository
 import com.github.catomon.tsukaremi.util.logMsg
@@ -31,6 +32,7 @@ import java.time.ZoneId
 
 class MainViewModel(
     val repository: RemindersRepository,
+    val reminderService: ReminderService,
     val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 
@@ -39,9 +41,6 @@ class MainViewModel(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
-
-    private val _reminderEvents = MutableSharedFlow<Reminder>(extraBufferCapacity = 10)
-    val reminderEvents = _reminderEvents.asSharedFlow()
 
     private val settingsStore: KStore<AppSettings> =
         storeOf(file = Path("$userFolderPath/settings.json"))
@@ -52,22 +51,6 @@ class MainViewModel(
         }
     )
     val appSettings = _appSettings.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            val reminders = repository.getAllRemindersList()
-            val now = LocalDateTime.now()
-            val dueReminders = reminders.filter { reminder ->
-                !reminder.isCompleted && reminder.remindAt.isBefore(now.minusMinutes(4))
-            }
-            dueReminders.forEach { reminder ->
-                this@MainViewModel.logMsg("Reminder updated: $reminder")
-                repository.updateReminder(reminder.copy(isCompleted = true))
-            }
-        }
-
-        startReminderChecker()
-    }
 
     fun updateSettings(settings: AppSettings) {
         _appSettings.value = settings
@@ -80,51 +63,5 @@ class MainViewModel(
     suspend fun loadSettings() = run {
         settingsStore.get() ?: settingsStore.set(AppSettings())
         settingsStore.get() ?: error("Could not set appSettings KStore.")
-    }
-
-    private var checkerJob: Job? = null
-    private fun startReminderChecker() {
-        if (checkerJob != null) return
-
-        checkerJob = viewModelScope.launch {
-            while (isActive) {
-                val now = LocalDateTime.now()
-                val dueReminders = reminders.value.filter { reminder ->
-                    !reminder.isCompleted && reminder.remindAt.isBefore(now) && reminder.remindAt.isAfter(
-                        now.minusMinutes(5)
-                    )
-                }
-                dueReminders.forEach { reminder ->
-                    onReminder(reminder)
-                }
-                delay(15_000)
-            }
-        }.apply {
-            invokeOnCompletion {
-                checkerJob = null
-            }
-        }
-    }
-
-    private fun onReminder(reminder: Reminder) {
-        this@MainViewModel.logMsg("Showing reminder: $reminder")
-        viewModelScope.launch {
-            repository.updateReminder(reminder.copy(isCompleted = true))
-            this@MainViewModel.logMsg("Reminder updated: $reminder")
-            _reminderEvents.tryEmit(reminder)
-        }
-    }
-
-    fun restartReminder(reminder: Reminder) {
-        viewModelScope.launch {
-            repository.updateReminder(reminder.copy(
-                isCompleted = false,
-                remindAt = run {
-                    val instant = Instant.ofEpochMilli(System.currentTimeMillis() + reminder.remindIn)
-                    val zoneId = ZoneId.systemDefault()
-                    instant.atZone(zoneId).toLocalDateTime()
-                }
-            ))
-        }
     }
 }

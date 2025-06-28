@@ -22,8 +22,12 @@ class RemindersRepositoryImpl(private val reminderDao: ReminderDao) : RemindersR
         reminderDao.delete(reminder.toEntity())
     }
 
-    override fun getReminderById(id: Int): Flow<Reminder?> {
-        return reminderDao.getReminderById(id).map { it?.toDomain() }
+    override fun getReminderByIdAsFlow(id: Int): Flow<Reminder?> {
+        return reminderDao.getReminderByIdAsFlow(id).map { it?.toDomain() }
+    }
+
+    override suspend fun getReminderById(id: Int): Reminder? {
+        return reminderDao.getReminderById(id)?.toDomain()
     }
 
     override fun getAllReminders(): Flow<List<Reminder>> {

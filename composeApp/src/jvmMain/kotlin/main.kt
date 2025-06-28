@@ -1,5 +1,6 @@
 import androidx.compose.ui.window.application
 import com.github.catomon.tsukaremi.di.appModule
+import com.github.catomon.tsukaremi.di.desktopModule
 import com.github.catomon.tsukaremi.ui.TsukaremiApp
 import com.github.catomon.tsukaremi.util.setComposeExceptionHandler
 import com.github.catomon.tsukaremi.util.setDefaultExceptionHandler
@@ -13,7 +14,7 @@ fun main() {
         setComposeExceptionHandler()
 
         startKoin {
-            modules(appModule)
+            modules(appModule, desktopModule)
         }
 
         setSkikoRenderApi()

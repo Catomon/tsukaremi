@@ -20,15 +20,16 @@ object SettingsDestination
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
-    onExitApp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(modifier) {
         Box(modifier = modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
-                Text("Settings", modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f))
+                Text(
+                    "Settings", modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -37,10 +38,6 @@ fun SettingsScreen(
                 ) {
                     TextButton(onClick = onBack) {
                         Text("BACK")
-                    }
-
-                    TextButton(onClick = onExitApp) {
-                        Text("Exit App")
                     }
                 }
             }

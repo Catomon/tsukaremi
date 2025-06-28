@@ -21,7 +21,7 @@ import tsukaremi.composeapp.generated.resources.app_icon
 import java.awt.Dimension
 
 @Composable
-fun ApplicationScope.TsukaremiMainWindow(viewModel: MainViewModel = koinViewModel(), modifier: Modifier = Modifier) {
+fun ApplicationScope.TsukaremiMainWindow(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val windowState =
         rememberWindowState(width = WindowConfig.WIDTH.dp, height = WindowConfig.HEIGHT.dp)
 

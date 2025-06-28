@@ -26,13 +26,16 @@ import com.github.catomon.tsukaremi.ui.windows.ReminderWindow
 import com.github.catomon.tsukaremi.ui.windows.TsukaremiMainWindow
 import com.github.catomon.tsukaremi.ui.windows.WindowConfig
 import com.github.catomon.tsukaremi.util.isNotificationAllowed
+import com.github.catomon.tsukaremi.util.logMsg
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import tsukaremi.composeapp.generated.resources.Res
 import tsukaremi.composeapp.generated.resources.app_icon
 import java.awt.Toolkit
+import java.time.LocalDateTime
 
 private val screenSize = Toolkit.getDefaultToolkit().screenSize
 private val screenWidth = screenSize.width
@@ -48,18 +51,38 @@ fun ApplicationScope.TsukaremiApp() =
         val shownReminders = remember { mutableStateListOf<Reminder>() }
         var lastReminder by remember { mutableStateOf<Reminder?>(null) }
 
+        val coroutineScope = rememberCoroutineScope()
+
+        //expire old reminders on start
         LaunchedEffect(Unit) {
             viewModel.viewModelScope.launch {
-                viewModel.reminderEvents.collect { reminder ->
-//                trayState.sendNotification(
-//                    Notification(
-//                        title = "Reminder: ${reminder.title}",
-//                        message = reminder.description.take(100)
-//                            .let { if (it.length == 100) it.dropLast(3) + "..." else it }
-//                    )
-//                )
+                val reminders = viewModel.repository.getAllRemindersList()
+                val now = LocalDateTime.now()
+                val dueReminders = reminders.filter { reminder ->
+                    !reminder.isCompleted && reminder.remindAt.isBefore(now.minusMinutes(4))
+                }
+                dueReminders.forEach { reminder ->
+                    logMsg("Reminder updated: $reminder")
+                    viewModel.repository.updateReminder(reminder.copy(isCompleted = true))
+                }
+            }
+        }
 
+        //reminders check loop
+        LaunchedEffect(Unit) {
+            while (isActive) {
+                val now = LocalDateTime.now()
+                val dueReminders = viewModel.reminders.value.filter { reminder ->
+                    !reminder.isCompleted && reminder.remindAt.isBefore(now) && reminder.remindAt.isAfter(
+                        now.minusMinutes(5)
+                    )
+                }
+                dueReminders.forEach { reminder ->
+                    viewModel.repository.updateReminder(reminder.copy(isCompleted = true))
+                    logMsg("Reminder updated: $reminder")
                     if (isNotificationAllowed()) {
+                        logMsg("Showing reminder: $reminder")
+
                         lastReminder = reminder
                         shownReminders += reminder
 
@@ -68,11 +91,11 @@ fun ApplicationScope.TsukaremiApp() =
                         shownReminders += lastThree
                     }
                 }
+                delay(15_000)
             }
         }
 
-        val coroutineScope = rememberCoroutineScope()
-
+        //auto hide reminder if hideReminderAfter > 0
         LaunchedEffect(lastReminder) {
             val lastReminder = lastReminder
             if (lastReminder != null && viewModel.appSettings.value.hideReminderAfter > 0) {
@@ -85,7 +108,7 @@ fun ApplicationScope.TsukaremiApp() =
 
         Tray(icon = painterResource(Res.drawable.app_icon), state = trayState)
 
-        TsukaremiMainWindow()
+        TsukaremiMainWindow(viewModel)
 
         if (shownReminders.isNotEmpty())
             shownReminders.takeLast(3).reversed().forEachIndexed { i, reminder ->
@@ -102,8 +125,10 @@ fun ApplicationScope.TsukaremiApp() =
                             )
                         },
                         onRestart = {
-                            viewModel.restartReminder(reminder)
-                            shownReminders -= reminder
+                            viewModel.viewModelScope.launch {
+                                viewModel.reminderService.restartReminder(reminder)
+                                shownReminders -= reminder
+                            }
                         },
                         onDismiss = {
                             shownReminders -= reminder
