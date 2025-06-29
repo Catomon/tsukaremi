@@ -10,9 +10,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -41,6 +44,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import tsukaremi.composeapp.generated.resources.Res
 import tsukaremi.composeapp.generated.resources.close_window
+import tsukaremi.composeapp.generated.resources.settings
 import tsukaremi.composeapp.generated.resources.top_bar_background
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -75,22 +79,30 @@ fun TsukaremiMainScreen(
                     )
             )
 
-            Text(
-                text = "Tsukaremi",
-                fontSize = 16.sp,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable {
-                        navController.navigate(ListDestination) {
-                            launchSingleTop = true
+                    .align(Alignment.TopEnd)
+                    .padding(top = padding.calculateTopPadding())
+            ) {
+                Text(
+                    text = "Tsukaremi",
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable {
+                            navController.popBackStack(ListDestination, false, false)
                         }
-                    }
-                    .align(Alignment.TopStart))
+                        .padding(start = 12.dp)
+                )
 
-            IconButton({
+                Spacer(Modifier.weight(1f))
 
-            }, modifier = Modifier.align(Alignment.TopEnd)) {
-                Icon(painterResource(Res.drawable.close_window), "Options", modifier = Modifier.size(20.dp))
+                IconButton({
+
+                }) {
+                    Icon(painterResource(Res.drawable.settings), "Options", modifier = Modifier.size(25.dp))
+                }
             }
         } //つかれみ //ツカレミ
 
