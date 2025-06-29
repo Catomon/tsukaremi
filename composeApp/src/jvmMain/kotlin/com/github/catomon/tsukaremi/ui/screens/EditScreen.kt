@@ -39,6 +39,7 @@ import com.github.catomon.tsukaremi.ui.components.TimePickerDialog
 import com.github.catomon.tsukaremi.ui.viewmodel.EditViewModel
 import com.github.catomon.tsukaremi.util.combineDateAndTime
 import com.github.catomon.tsukaremi.util.formatMillisToDateString
+import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
@@ -115,12 +116,12 @@ fun EditScreen(
     }
     var selectedTime by remember(isTimer, reminder) {
         mutableStateOf(
-            if (isTimer) reminder?.remindIn?.let {
-                val mnsTotal = it / 1000 / 60
+            if (isTimer) reminder?.remindIn?.let { epochMillis ->
+                val mnsTotal = Instant.ofEpochMilli(epochMillis).atZone(ZoneId.systemDefault()).toEpochSecond() / 60
                 val hrs = mnsTotal / 60
                 val mns = mnsTotal - hrs * 60
                 hrs.toInt() to mns.toInt()
-            } ?: (defaultTimerRemindInTime) else reminder?.remindAt?.let { it.hour to it.minute } ?: LocalTime.now()
+            } ?: (defaultTimerRemindInTime) else reminder?.remindAt?.fromUtcToSystemZoned()?.let { it.hour to it.minute } ?: LocalTime.now()
                 .let { it.hour to it.minute })
     }
 
@@ -308,7 +309,7 @@ fun EditScreen(
                         val remindIn = selectedTime.first * 60L * 60L * 1000L + selectedTime.second * 60L * 1000L
                         val remindAt = if (isTimer) {
                             val instant = Instant.ofEpochMilli(System.currentTimeMillis() + remindIn)
-                            val zoneId = ZoneId.systemDefault()
+                            val zoneId = ZoneOffset.UTC
                             instant.atZone(zoneId).toLocalDateTime()
                         } else {
                             LocalDateTime.ofInstant(

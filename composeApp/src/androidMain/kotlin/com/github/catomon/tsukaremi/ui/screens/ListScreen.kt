@@ -9,7 +9,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,7 +52,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.util.rememberLazyListStateHijacker
-import com.github.catomon.tsukaremi.util.epochMillisToSimpleDate
+import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
+import com.github.catomon.tsukaremi.util.toSimpleString
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
@@ -62,8 +62,6 @@ import tsukaremi.composeapp.generated.resources.lucky_background_stars
 import tsukaremi.composeapp.generated.resources.pencil
 import tsukaremi.composeapp.generated.resources.repeat
 import tsukaremi.composeapp.generated.resources.trash
-import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.ZoneOffset
 
 @Serializable
@@ -194,13 +192,7 @@ fun ReminderListItem(
             Text(reminder.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(reminder.description, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(remember(reminder) {
-                epochMillisToSimpleDate(run {
-                    val remindAt: LocalDateTime = reminder.remindAt
-                    val zoneId = ZoneId.systemDefault()
-                    val zonedDateTime = remindAt.atZone(zoneId)
-                    val offset: ZoneOffset = zonedDateTime.offset
-                    remindAt.toEpochSecond(offset) * 1000
-                })
+                reminder.remindAt.fromUtcToSystemZoned().toSimpleString()
             }, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
 
