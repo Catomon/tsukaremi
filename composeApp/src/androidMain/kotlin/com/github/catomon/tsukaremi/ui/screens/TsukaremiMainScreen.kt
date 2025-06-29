@@ -4,15 +4,15 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
@@ -40,10 +41,12 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import tsukaremi.composeapp.generated.resources.Res
 import tsukaremi.composeapp.generated.resources.close_window
+import tsukaremi.composeapp.generated.resources.top_bar_background
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TsukaremiMainScreen(
+    padding: PaddingValues,
     viewModel: MainViewModel = koinViewModel(),
     modifier: Modifier = Modifier
 ) = Surface(modifier = modifier) {
@@ -55,32 +58,38 @@ fun TsukaremiMainScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 6.dp)
-                .height(32.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+//                .padding(horizontal = 6.dp)
+                .height(120.dp),
         ) {
+            Image(
+                painterResource(Res.drawable.top_bar_background),
+                null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .matchParentSize()
+                    .clip(
+                        RoundedCornerShape(0.dp, 0.dp, 8.dp, 8.dp)
+                    )
+            )
+
             Text(
                 text = "Tsukaremi",
                 fontSize = 16.sp,
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
                     .clickable {
-                        navController.navigate(ListDestination)
-                    })
-
-            Spacer(
-                Modifier
-                    .height(1.dp)
-                    .weight(1f)
-            )
+                        navController.navigate(ListDestination) {
+                            launchSingleTop = true
+                        }
+                    }
+                    .align(Alignment.TopStart))
 
             IconButton({
 
-            }) {
+            }, modifier = Modifier.align(Alignment.TopEnd)) {
                 Icon(painterResource(Res.drawable.close_window), "Options", modifier = Modifier.size(20.dp))
             }
         } //つかれみ //ツカレミ
@@ -90,15 +99,19 @@ fun TsukaremiMainScreen(
                 navController = navController,
                 startDestination = ListDestination,
                 enterTransition = { slideInHorizontally { it } },
-                exitTransition = { slideOutHorizontally { it } }
+                exitTransition = { slideOutHorizontally { it } },
             ) {
                 composable<ListDestination> {
                     ListScreen(
                         reminders = reminders, onCreateNew = {
-                            navController.navigate(EditDestination())
+                            navController.navigate(EditDestination()) {
+                                launchSingleTop = true
+                            }
                         },
                         onEdit = {
-                            navController.navigate(EditDestination(it.id))
+                            navController.navigate(EditDestination(it.id)) {
+                                launchSingleTop = true
+                            }
                         },
                         onRestart = {
                             viewModel.viewModelScope.launch {
@@ -110,7 +123,8 @@ fun TsukaremiMainScreen(
                                 viewModel.reminderService.cancelReminder(it)
                                 viewModel.repository.deleteReminder(it)
                             }
-                        }
+                        },
+                        padding = padding
                     )
                 }
 
@@ -119,6 +133,7 @@ fun TsukaremiMainScreen(
                         it.toRoute<EditDestination>().reminderId,
                         onBack = navController::navigateUp,
                         onConfirm = navController::navigateUp,
+                        padding = padding,
                     )
                 }
 

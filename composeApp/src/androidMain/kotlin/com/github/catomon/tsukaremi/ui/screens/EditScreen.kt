@@ -2,6 +2,8 @@ package com.github.catomon.tsukaremi.ui.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -22,14 +25,17 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.components.DatePickerDialog
@@ -39,7 +45,10 @@ import com.github.catomon.tsukaremi.util.combineDateAndTime
 import com.github.catomon.tsukaremi.util.formatMillisToDateString
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
+import tsukaremi.composeapp.generated.resources.Res
+import tsukaremi.composeapp.generated.resources.lucky_background_stars
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -92,10 +101,9 @@ fun EditScreen(
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EditViewModel = koinViewModel(),
+    padding: PaddingValues = PaddingValues(Dp.Unspecified)
 ) {
     var isLoading by remember { mutableStateOf(false) }
-
-//    var reminderId: Int? by rememberSaveable { mutableStateOf(reminderId) }
 
     var reminder by remember { mutableStateOf<Reminder?>(null) }
     var title by remember(reminder) { mutableStateOf(reminder?.title ?: "") }
@@ -107,7 +115,7 @@ fun EditScreen(
     var showTimePickDialog by remember { mutableStateOf(false) }
 
     var selectedDateMillis by remember(reminder) {
-        mutableStateOf(
+        mutableLongStateOf(
             reminder?.remindAt?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
                 ?: System.currentTimeMillis()
         )
@@ -138,7 +146,19 @@ fun EditScreen(
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        Column {
+        Image(
+            painterResource(Res.drawable.lucky_background_stars),
+            null,
+            modifier.matchParentSize(),
+            contentScale = ContentScale.Crop,
+            colorFilter = ColorFilter.tint(Color(0xff9775d5))
+        )
+
+        Column(
+            Modifier
+                .background(MaterialTheme.colorScheme.background.copy(0.75f))
+                .padding(bottom = padding.calculateBottomPadding())
+        ) {
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
@@ -186,9 +206,11 @@ fun EditScreen(
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Spacer(Modifier
-                    .height(1.dp)
-                    .weight(0.2f))
+                Spacer(
+                    Modifier
+                        .height(1.dp)
+                        .weight(0.2f)
+                )
 
                 Text("Alarm")
                 RadioButton(
@@ -199,9 +221,11 @@ fun EditScreen(
                     enabled = !isLoading,
                 )
 
-                Spacer(Modifier
-                    .height(1.dp)
-                    .weight(0.2f))
+                Spacer(
+                    Modifier
+                        .height(1.dp)
+                        .weight(0.2f)
+                )
 
                 Text("Timer")
                 RadioButton(
@@ -212,9 +236,11 @@ fun EditScreen(
                     enabled = !isLoading,
                 )
 
-                Spacer(Modifier
-                    .height(1.dp)
-                    .weight(0.2f))
+                Spacer(
+                    Modifier
+                        .height(1.dp)
+                        .weight(0.2f)
+                )
             }
 
             Row(

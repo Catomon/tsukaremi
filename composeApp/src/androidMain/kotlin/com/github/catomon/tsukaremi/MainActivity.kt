@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             TsukaremiTheme {
                 Scaffold {
-                    TsukaremiMainScreen(modifier = Modifier.padding(it))
+                    TsukaremiMainScreen(it)
                 }
             }
         }
