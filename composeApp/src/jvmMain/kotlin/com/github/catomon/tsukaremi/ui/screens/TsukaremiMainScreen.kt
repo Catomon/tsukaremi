@@ -31,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +54,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import tsukaremi.composeapp.generated.resources.Res
 import tsukaremi.composeapp.generated.resources.close_window
 import tsukaremi.composeapp.generated.resources.minimize_window
+import tsukaremi.composeapp.generated.resources.settings
 import tsukaremi.composeapp.generated.resources.top_bar_background
 import kotlin.system.exitProcess
 
@@ -65,10 +67,16 @@ fun TsukaremiMainScreen(
     val window = LocalWindow.current
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen =
-        remember(currentBackStackEntry) { currentBackStackEntry?.destination?.route?.split("?")?.firstOrNull() }
+    val currentScreen by
+    remember(currentBackStackEntry) {
+        mutableStateOf(
+            currentBackStackEntry?.destination?.route?.split("?")?.firstOrNull()
+        )
+    }
 
     val reminders by viewModel.reminders.collectAsState()
+
+    val appSettings by viewModel.appSettings.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -89,6 +97,17 @@ fun TsukaremiMainScreen(
                     RoundedCornerShape(0.dp, 0.dp, 8.dp, 8.dp)
                 )
             )
+
+            IconButton({
+                if (currentScreen == SettingsDestination::class.qualifiedName)
+                    navController.navigateUp()
+                else
+                    navController.navigate(SettingsDestination) {
+                        launchSingleTop = true
+                    }
+            }, modifier = Modifier.align(Alignment.BottomStart)) {
+                Icon(painterResource(Res.drawable.settings), "Options", modifier = Modifier.size(25.dp))
+            }
 
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.align(Alignment.TopEnd)) {
                 Text(
@@ -159,6 +178,18 @@ fun TsukaremiMainScreen(
                             }
                         }
                     }
+
+                    SettingsDestination::class.qualifiedName -> {
+                        Box(
+                            Modifier
+                                .padding(4.dp).fillMaxWidth(),
+                            contentAlignment = Alignment.BottomEnd
+                        ) {
+                            Button(navController::navigateUp, shape = CircleShape) {
+                                Text("Save & return")
+                            }
+                        }
+                    }
                 }
             }
         } //つかれみ //ツカレミ
@@ -200,10 +231,10 @@ fun TsukaremiMainScreen(
                 }
 
                 composable<SettingsDestination> {
-                    SettingsScreen(
-                        onBack = navController::navigateUp,
-                        onExitApp = exitApplication
-                    )
+                    SettingsScreen(appSettings, {
+                        viewModel.updateSettings(it)
+                        viewModel.saveSettings()
+                    })
                 }
             }
         }

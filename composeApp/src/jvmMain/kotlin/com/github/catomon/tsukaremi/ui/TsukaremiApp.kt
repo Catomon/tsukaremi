@@ -36,6 +36,7 @@ import tsukaremi.composeapp.generated.resources.Res
 import tsukaremi.composeapp.generated.resources.app_icon
 import java.awt.Toolkit
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 private val screenSize = Toolkit.getDefaultToolkit().screenSize
 private val screenWidth = screenSize.width
@@ -57,7 +58,7 @@ fun ApplicationScope.TsukaremiApp() =
         LaunchedEffect(Unit) {
             viewModel.viewModelScope.launch {
                 val reminders = viewModel.repository.getAllRemindersList()
-                val now = LocalDateTime.now()
+                val now = LocalDateTime.now(ZoneOffset.UTC)
                 val dueReminders = reminders.filter { reminder ->
                     !reminder.isCompleted && reminder.remindAt.isBefore(now.minusMinutes(4))
                 }
@@ -71,7 +72,7 @@ fun ApplicationScope.TsukaremiApp() =
         //reminders check loop
         LaunchedEffect(Unit) {
             while (isActive) {
-                val now = LocalDateTime.now()
+                val now = LocalDateTime.now(ZoneOffset.UTC)
                 val dueReminders = viewModel.reminders.value.filter { reminder ->
                     !reminder.isCompleted && reminder.remindAt.isBefore(now) && reminder.remindAt.isAfter(
                         now.minusMinutes(5)
@@ -89,20 +90,18 @@ fun ApplicationScope.TsukaremiApp() =
                         val lastThree = shownReminders.takeLast(3)
                         shownReminders.clear()
                         shownReminders += lastThree
+
+                        //auto hide reminder if hideReminderAfter > 0
+                        val lastReminder = lastReminder
+                        if (lastReminder != null && viewModel.appSettings.value.hideReminderAfter > 0) {
+                            coroutineScope.launch {
+                                delay(viewModel.appSettings.value.hideReminderAfter)
+                                shownReminders -= lastReminder
+                            }
+                        }
                     }
                 }
                 delay(15_000)
-            }
-        }
-
-        //auto hide reminder if hideReminderAfter > 0
-        LaunchedEffect(lastReminder) {
-            val lastReminder = lastReminder
-            if (lastReminder != null && viewModel.appSettings.value.hideReminderAfter > 0) {
-                coroutineScope.launch {
-                    delay(viewModel.appSettings.value.hideReminderAfter)
-                    shownReminders -= lastReminder
-                }
             }
         }
 

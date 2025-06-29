@@ -80,7 +80,7 @@ fun ListScreen(
 ) {
     val (oldReminders, incomingReminders) = remember(reminders) {
         reminders.sortedByDescending { it.remindAt.toInstant(ZoneOffset.UTC).epochSecond }.groupBy { it.isCompleted }
-            .let { (it[true] ?: emptyList()) to (it[false] ?: emptyList()) }
+            .let { (it[true] ?: emptyList()) to (it[false]?.reversed() ?: emptyList()) }
     }
 
     val listState = rememberLazyListState()

@@ -4,7 +4,7 @@ import com.github.catomon.tsukaremi.domain.ReminderService
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.domain.repository.RemindersRepository
 import java.time.Instant
-import java.time.ZoneId
+import java.time.ZoneOffset
 
 actual class ReminderServiceImpl(private val repository: RemindersRepository) : ReminderService {
     override suspend fun scheduleReminder(reminder: Reminder) {
@@ -29,7 +29,7 @@ actual class ReminderServiceImpl(private val repository: RemindersRepository) : 
                 isCompleted = false,
                 remindAt = run {
                     val instant = Instant.ofEpochMilli(System.currentTimeMillis() + reminder.remindIn)
-                    val zoneId = ZoneId.systemDefault()
+                    val zoneId = ZoneOffset.UTC
                     instant.atZone(zoneId).toLocalDateTime()
                 }
             ))

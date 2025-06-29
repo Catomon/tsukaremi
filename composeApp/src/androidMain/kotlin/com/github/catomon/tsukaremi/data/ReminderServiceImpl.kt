@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
+import java.time.ZoneOffset
 
 actual class ReminderServiceImpl(private val context: Context, private val repository: RemindersRepository) :
     ReminderService {
@@ -103,7 +104,7 @@ actual class ReminderServiceImpl(private val context: Context, private val repos
                 isCompleted = false,
                 remindAt = run {
                     val instant = Instant.ofEpochMilli(System.currentTimeMillis() + reminder.remindIn)
-                    val zoneId = ZoneId.systemDefault()
+                    val zoneId = ZoneOffset.UTC
                     instant.atZone(zoneId).toLocalDateTime()
                 }
             ))
