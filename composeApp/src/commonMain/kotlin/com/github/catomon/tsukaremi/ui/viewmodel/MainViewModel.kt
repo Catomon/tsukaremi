@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.catomon.tsukaremi.data.local.AppSettings
 import com.github.catomon.tsukaremi.data.local.platform.userFolderPath
-import com.github.catomon.tsukaremi.domain.ReminderService
+import com.github.catomon.tsukaremi.domain.ReminderManager
 import com.github.catomon.tsukaremi.domain.repository.RemindersRepository
 import io.github.xxfast.kstore.KStore
 import io.github.xxfast.kstore.file.storeOf
@@ -21,7 +21,7 @@ import kotlinx.io.files.Path
 
 class MainViewModel(
     val repository: RemindersRepository,
-    val reminderService: ReminderService,
+    val reminderManager: ReminderManager,
     val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 

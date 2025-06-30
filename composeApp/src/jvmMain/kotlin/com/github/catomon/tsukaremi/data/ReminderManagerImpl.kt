@@ -1,12 +1,12 @@
 package com.github.catomon.tsukaremi.data
 
-import com.github.catomon.tsukaremi.domain.ReminderService
+import com.github.catomon.tsukaremi.domain.ReminderManager
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.domain.repository.RemindersRepository
 import java.time.Instant
 import java.time.ZoneOffset
 
-actual class ReminderServiceImpl(private val repository: RemindersRepository) : ReminderService {
+actual class ReminderManagerImpl(private val repository: RemindersRepository) : ReminderManager {
     override suspend fun scheduleReminder(reminder: Reminder) {
         if (reminder.isCompleted) {
             repository.updateReminder(reminder.copy(isCompleted = false))

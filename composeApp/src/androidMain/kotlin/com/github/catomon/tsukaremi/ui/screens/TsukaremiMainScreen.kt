@@ -138,12 +138,12 @@ fun TsukaremiMainScreen(
                         },
                         onRestart = {
                             viewModel.viewModelScope.launch {
-                                viewModel.reminderService.restartReminder(it)
+                                viewModel.reminderManager.restartReminder(it)
                             }
                         },
                         onDelete = {
                             viewModel.viewModelScope.launch {
-                                viewModel.reminderService.cancelReminder(it)
+                                viewModel.reminderManager.cancelReminder(it)
                                 viewModel.repository.deleteReminder(it)
                             }
                         },

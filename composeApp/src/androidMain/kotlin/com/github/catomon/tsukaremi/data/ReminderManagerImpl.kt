@@ -9,17 +9,16 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.github.catomon.tsukaremi.ReminderReceiver
-import com.github.catomon.tsukaremi.domain.ReminderService
+import com.github.catomon.tsukaremi.domain.ReminderManager
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.domain.repository.RemindersRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.Instant
-import java.time.ZoneId
 import java.time.ZoneOffset
 
-actual class ReminderServiceImpl(private val context: Context, private val repository: RemindersRepository) :
-    ReminderService {
+actual class ReminderManagerImpl(private val context: Context, private val repository: RemindersRepository) :
+    ReminderManager {
     override suspend fun scheduleReminder(reminder: Reminder) {
         withContext(Dispatchers.IO) {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager

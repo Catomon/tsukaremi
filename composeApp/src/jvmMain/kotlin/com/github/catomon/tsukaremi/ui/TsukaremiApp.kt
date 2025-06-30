@@ -8,7 +8,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.unit.dp
@@ -83,7 +82,7 @@ fun ApplicationScope.TsukaremiApp() =
                         },
                         onRestart = {
                             viewModel.viewModelScope.launch {
-                                viewModel.reminderService.restartReminder(reminder)
+                                viewModel.reminderManager.restartReminder(reminder)
                                 shownReminders -= reminder
                             }
                         },

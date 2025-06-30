@@ -1,9 +1,7 @@
 package com.github.catomon.tsukaremi.di
 
-import androidx.lifecycle.SavedStateHandle
 import com.github.catomon.tsukaremi.data.local.platform.createDatabase
 import com.github.catomon.tsukaremi.data.repository.RemindersRepositoryImpl
-import com.github.catomon.tsukaremi.domain.ReminderService
 import com.github.catomon.tsukaremi.domain.repository.RemindersRepository
 import com.github.catomon.tsukaremi.ui.viewmodel.EditViewModel
 import com.github.catomon.tsukaremi.ui.viewmodel.MainViewModel
