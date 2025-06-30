@@ -40,13 +40,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.github.catomon.tsukaremi.ui.components.SettingsButton
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalNavController
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalWindow
+import com.github.catomon.tsukaremi.ui.navigation.EditDestination
+import com.github.catomon.tsukaremi.ui.navigation.ListDestination
+import com.github.catomon.tsukaremi.ui.navigation.SettingsDestination
+import com.github.catomon.tsukaremi.ui.navigation.navigateToSettings
 import com.github.catomon.tsukaremi.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
@@ -54,7 +60,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import tsukaremi.composeapp.generated.resources.Res
 import tsukaremi.composeapp.generated.resources.close_window
 import tsukaremi.composeapp.generated.resources.minimize_window
-import tsukaremi.composeapp.generated.resources.settings
 import tsukaremi.composeapp.generated.resources.top_bar_background
 import kotlin.system.exitProcess
 
@@ -98,16 +103,9 @@ fun TsukaremiMainScreen(
                 )
             )
 
-            IconButton({
-                if (currentScreen == SettingsDestination::class.qualifiedName)
-                    navController.navigateUp()
-                else
-                    navController.navigate(SettingsDestination) {
-                        launchSingleTop = true
-                    }
-            }, modifier = Modifier.align(Alignment.BottomStart)) {
-                Icon(painterResource(Res.drawable.settings), "Options", modifier = Modifier.size(25.dp))
-            }
+            SettingsButton({
+                navigateToSettings(currentScreen, navController)
+            }, Modifier.align(Alignment.BottomStart))
 
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.align(Alignment.TopEnd)) {
                 Text(
@@ -142,57 +140,8 @@ fun TsukaremiMainScreen(
                 }
             }
 
-            AnimatedContent(
-                currentScreen,
-                modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(50.dp),
-                transitionSpec = {
-                    (slideInVertically(initialOffsetY = { it / 2 }) + fadeIn()) togetherWith (slideOutVertically(
-                        targetOffsetY = { it / 2 }) + fadeOut())
-                },
-                contentKey = { currentScreen }) {
-                when (currentScreen) {
-                    ListDestination::class.qualifiedName -> {
-                        Box(
-                            Modifier
-                                .padding(4.dp).fillMaxWidth(),
-                            contentAlignment = Alignment.BottomEnd,
-                        ) {
-                            Button(onClick = {
-                                navController.navigate(EditDestination()) {
-                                    launchSingleTop = true
-                                }
-                            }) {
-                                Text("New Reminder")
-                            }
-                        }
-                    }
-
-                    EditDestination::class.qualifiedName -> {
-                        Box(
-                            Modifier
-                                .padding(4.dp).fillMaxWidth(),
-                            contentAlignment = Alignment.BottomEnd
-                        ) {
-                            Button(navController::navigateUp, shape = CircleShape) {
-                                Text("Back to list")
-                            }
-                        }
-                    }
-
-                    SettingsDestination::class.qualifiedName -> {
-                        Box(
-                            Modifier
-                                .padding(4.dp).fillMaxWidth(),
-                            contentAlignment = Alignment.BottomEnd
-                        ) {
-                            Button(navController::navigateUp, shape = CircleShape) {
-                                Text("Save & return")
-                            }
-                        }
-                    }
-                }
-            }
-        } //つかれみ //ツカレミ
+            MainScreenNavButton(currentScreen, navController, Modifier.align(Alignment.Companion.BottomCenter))
+        }
 
         CompositionLocalProvider(LocalNavController provides navController) {
             NavHost(
@@ -235,6 +184,64 @@ fun TsukaremiMainScreen(
                         viewModel.updateSettings(it)
                         viewModel.saveSettings()
                     })
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MainScreenNavButton(
+    currentScreen: String?,
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    AnimatedContent(
+        currentScreen,
+        modifier = modifier.fillMaxWidth().height(50.dp),
+        transitionSpec = {
+            (slideInVertically(initialOffsetY = { it / 2 }) + fadeIn()) togetherWith (slideOutVertically(
+                targetOffsetY = { it / 2 }) + fadeOut())
+        },
+        contentKey = { currentScreen }) {
+        when (currentScreen) {
+            ListDestination::class.qualifiedName -> {
+                Box(
+                    Modifier.Companion
+                        .padding(4.dp).fillMaxWidth(),
+                    contentAlignment = Alignment.Companion.BottomEnd,
+                ) {
+                    Button(onClick = {
+                        navController.navigate(EditDestination()) {
+                            launchSingleTop = true
+                        }
+                    }) {
+                        Text("New Reminder")
+                    }
+                }
+            }
+
+            EditDestination::class.qualifiedName -> {
+                Box(
+                    Modifier.Companion
+                        .padding(4.dp).fillMaxWidth(),
+                    contentAlignment = Alignment.Companion.BottomEnd
+                ) {
+                    Button(navController::navigateUp, shape = CircleShape) {
+                        Text("Back to list")
+                    }
+                }
+            }
+
+            SettingsDestination::class.qualifiedName -> {
+                Box(
+                    Modifier.Companion
+                        .padding(4.dp).fillMaxWidth(),
+                    contentAlignment = Alignment.Companion.BottomEnd
+                ) {
+                    Button(navController::navigateUp, shape = CircleShape) {
+                        Text("Save & return")
+                    }
                 }
             }
         }

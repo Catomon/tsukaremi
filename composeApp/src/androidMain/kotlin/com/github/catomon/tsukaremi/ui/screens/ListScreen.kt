@@ -51,11 +51,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.tsukaremi.domain.model.Reminder
+import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.ui.util.rememberLazyListStateHijacker
 import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
 import com.github.catomon.tsukaremi.util.toSimpleString
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
 import tsukaremi.composeapp.generated.resources.Res
 import tsukaremi.composeapp.generated.resources.lucky_background_stars
@@ -63,9 +63,6 @@ import tsukaremi.composeapp.generated.resources.pencil
 import tsukaremi.composeapp.generated.resources.repeat
 import tsukaremi.composeapp.generated.resources.trash
 import java.time.ZoneOffset
-
-@Serializable
-object ListDestination
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -96,17 +93,15 @@ fun ListScreen(
             colorFilter = ColorFilter.tint(Color(0xff9775d5))
         )
 
-        val backgroundColor = MaterialTheme.colorScheme.background.copy(0.75f)
-
         Box(
             contentAlignment = Alignment.Center, modifier = Modifier
                 .matchParentSize()
-                .graphicsLayer() {
+                .graphicsLayer {
                     compositingStrategy = CompositingStrategy.Offscreen
                 }
                 .drawWithContent {
                     drawContent()
-                    drawRect(backgroundColor, size = size, blendMode = BlendMode.SrcOut)
+                    drawRect(TsukaremiTheme.colors.background, size = size, blendMode = BlendMode.SrcOut)
                     drawContent()
                 }
         ) {

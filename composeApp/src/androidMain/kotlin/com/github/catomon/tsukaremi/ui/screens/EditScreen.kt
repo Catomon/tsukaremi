@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -40,12 +39,12 @@ import androidx.compose.ui.unit.dp
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.components.DatePickerDialog
 import com.github.catomon.tsukaremi.ui.components.TimePickerDialog
+import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.ui.viewmodel.EditViewModel
 import com.github.catomon.tsukaremi.util.combineDateAndTime
 import com.github.catomon.tsukaremi.util.formatMillisToDateString
 import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import tsukaremi.composeapp.generated.resources.Res
@@ -58,9 +57,6 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 
 typealias HoursMinutes = Pair<Int, Int>
-
-@Serializable
-data class EditDestination(val reminderId: Int? = null)
 
 private val defaultTimerRemindInTime = 0 to 0
 
@@ -128,7 +124,8 @@ fun EditScreen(
                 val hrs = mnsTotal / 60
                 val mns = mnsTotal - hrs * 60
                 hrs.toInt() to mns.toInt()
-            } ?: (defaultTimerRemindInTime) else reminder?.remindAt?.fromUtcToSystemZoned()?.let { it.hour to it.minute } ?: LocalTime.now()
+            } ?: (defaultTimerRemindInTime) else reminder?.remindAt?.fromUtcToSystemZoned()
+                ?.let { it.hour to it.minute } ?: LocalTime.now()
                 .let { it.hour to it.minute })
     }
 
@@ -157,7 +154,7 @@ fun EditScreen(
 
         Column(
             Modifier
-                .background(MaterialTheme.colorScheme.background.copy(0.75f))
+                .background(TsukaremiTheme.colors.background)
                 .padding(bottom = padding.calculateBottomPadding())
         ) {
             OutlinedTextField(

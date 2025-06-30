@@ -37,7 +37,7 @@ actual class ReminderServiceImpl(private val context: Context, private val repos
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-            val triggerAtMillis = reminder.remindAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            val triggerAtMillis = reminder.remindAt.atZone(ZoneOffset.UTC).toInstant().toEpochMilli()
 
             if (canScheduleExactAlarms)
                 alarmManager.setExactAndAllowWhileIdle(

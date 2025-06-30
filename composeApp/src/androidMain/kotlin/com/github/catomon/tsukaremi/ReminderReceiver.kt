@@ -21,8 +21,6 @@ class ReminderReceiver : BroadcastReceiver(), KoinComponent {
             val reminderId =
                 intent.hasExtra("reminderId").let { if (it == true) intent.getIntExtra("reminderId", -1) else -1 }
 
-            logMsg("Got reminderId: $reminderId")
-
             if (reminderId == -1) return@launch
             val reminder = repo.getReminderById(reminderId) ?: return@launch
 

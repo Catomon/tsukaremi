@@ -43,5 +43,5 @@ fun ZonedDateTime.toSimpleString(): String {
             }:${localDateTime.minute.toString().padStart(2, '0')}"
 }
 
-fun LocalDateTime.fromUtcToSystemZoned() =
+fun LocalDateTime.fromUtcToSystemZoned(): ZonedDateTime =
     this.atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault())

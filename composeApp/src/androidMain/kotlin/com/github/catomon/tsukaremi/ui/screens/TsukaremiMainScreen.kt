@@ -16,16 +16,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,16 +34,20 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.github.catomon.tsukaremi.ui.components.SettingsButton
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalNavController
+import com.github.catomon.tsukaremi.ui.navigation.EditDestination
+import com.github.catomon.tsukaremi.ui.navigation.ListDestination
+import com.github.catomon.tsukaremi.ui.navigation.SettingsDestination
+import com.github.catomon.tsukaremi.ui.navigation.navigateToSettings
 import com.github.catomon.tsukaremi.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import tsukaremi.composeapp.generated.resources.Res
-import tsukaremi.composeapp.generated.resources.close_window
-import tsukaremi.composeapp.generated.resources.settings
 import tsukaremi.composeapp.generated.resources.top_bar_background
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -55,7 +58,17 @@ fun TsukaremiMainScreen(
     modifier: Modifier = Modifier
 ) = Surface(modifier = modifier) {
     val navController = rememberNavController()
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentScreen by
+    remember(currentBackStackEntry) {
+        mutableStateOf(
+            currentBackStackEntry?.destination?.route?.split("?")?.firstOrNull()
+        )
+    }
+
     val reminders by viewModel.reminders.collectAsState()
+
+    val appSettings by viewModel.appSettings.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -98,13 +111,11 @@ fun TsukaremiMainScreen(
 
                 Spacer(Modifier.weight(1f))
 
-                IconButton({
-
-                }) {
-                    Icon(painterResource(Res.drawable.settings), "Options", modifier = Modifier.size(25.dp))
-                }
+                SettingsButton({
+                    navigateToSettings(currentScreen, navController)
+                })
             }
-        } //つかれみ //ツカレミ
+        }
 
         CompositionLocalProvider(LocalNavController provides navController) {
             NavHost(
@@ -151,7 +162,13 @@ fun TsukaremiMainScreen(
 
                 composable<SettingsDestination> {
                     SettingsScreen(
-                        onBack = navController::navigateUp,
+                        navController::navigateUp,
+                        appSettings,
+                        {
+                            viewModel.updateSettings(it)
+                            viewModel.saveSettings()
+                        },
+                        padding = padding,
                     )
                 }
             }

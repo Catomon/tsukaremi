@@ -31,11 +31,9 @@ import com.github.catomon.tsukaremi.ui.modifiers.luckyWindowDecoration
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.ui.util.playSound
 import com.github.catomon.tsukaremi.util.canAlwaysOnTop
-import com.github.catomon.tsukaremi.util.epochMillisToSimpleDate
+import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
+import com.github.catomon.tsukaremi.util.toSimpleString
 import com.github.panpf.sketch.AsyncImage
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
 
 @Composable
 fun ReminderWindow(
@@ -96,13 +94,7 @@ private fun ReminderWindowContent(
             Box(Modifier.fillMaxWidth()) {
                 Text(
                     remember {
-                        epochMillisToSimpleDate(run {
-                            val remindAt: LocalDateTime = reminder.remindAt
-                            val zoneId = ZoneId.systemDefault()
-                            val zonedDateTime = remindAt.atZone(zoneId)
-                            val offset: ZoneOffset = zonedDateTime.offset
-                            remindAt.toEpochSecond(offset) * 1000
-                        })
+                        reminder.remindAt.fromUtcToSystemZoned().toSimpleString()
                     }, modifier = Modifier.align(Alignment.BottomStart),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1, fontSize = 12.sp

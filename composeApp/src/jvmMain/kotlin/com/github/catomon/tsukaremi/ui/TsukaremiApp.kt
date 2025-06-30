@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Tray
@@ -42,6 +43,14 @@ private val screenSize = Toolkit.getDefaultToolkit().screenSize
 private val screenWidth = screenSize.width
 private val screenHeight = screenSize.height
 
+object AppViewModelStoreOwner : ViewModelStoreOwner {
+    override val viewModelStore: ViewModelStore = ViewModelStore()
+
+    fun dispose() {
+        viewModelStore.clear()
+    }
+}
+
 @Composable
 fun ApplicationScope.TsukaremiApp() =
     CompositionLocalProvider(LocalViewModelStoreOwner provides AppViewModelStoreOwner) {
@@ -52,58 +61,7 @@ fun ApplicationScope.TsukaremiApp() =
         val shownReminders = remember { mutableStateListOf<Reminder>() }
         var lastReminder by remember { mutableStateOf<Reminder?>(null) }
 
-        val coroutineScope = rememberCoroutineScope()
-
-        //expire old reminders on start
-        LaunchedEffect(Unit) {
-            viewModel.viewModelScope.launch {
-                val reminders = viewModel.repository.getAllRemindersList()
-                val now = LocalDateTime.now(ZoneOffset.UTC)
-                val dueReminders = reminders.filter { reminder ->
-                    !reminder.isCompleted && reminder.remindAt.isBefore(now.minusMinutes(4))
-                }
-                dueReminders.forEach { reminder ->
-                    logMsg("Reminder updated: $reminder")
-                    viewModel.repository.updateReminder(reminder.copy(isCompleted = true))
-                }
-            }
-        }
-
-        //reminders check loop
-        LaunchedEffect(Unit) {
-            while (isActive) {
-                val now = LocalDateTime.now(ZoneOffset.UTC)
-                val dueReminders = viewModel.reminders.value.filter { reminder ->
-                    !reminder.isCompleted && reminder.remindAt.isBefore(now) && reminder.remindAt.isAfter(
-                        now.minusMinutes(5)
-                    )
-                }
-                dueReminders.forEach { reminder ->
-                    viewModel.repository.updateReminder(reminder.copy(isCompleted = true))
-                    logMsg("Reminder updated: $reminder")
-                    if (isNotificationAllowed()) {
-                        logMsg("Showing reminder: $reminder")
-
-                        lastReminder = reminder
-                        shownReminders += reminder
-
-                        val lastThree = shownReminders.takeLast(3)
-                        shownReminders.clear()
-                        shownReminders += lastThree
-
-                        //auto hide reminder if hideReminderAfter > 0
-                        val lastReminder = lastReminder
-                        if (lastReminder != null && viewModel.appSettings.value.hideReminderAfter > 0) {
-                            coroutineScope.launch {
-                                delay(viewModel.appSettings.value.hideReminderAfter)
-                                shownReminders -= lastReminder
-                            }
-                        }
-                    }
-                }
-                delay(15_000)
-            }
-        }
+        RemindersUpdater(viewModel, lastReminder, shownReminders)
 
         Tray(icon = painterResource(Res.drawable.app_icon), state = trayState)
 
@@ -137,10 +95,61 @@ fun ApplicationScope.TsukaremiApp() =
             }
     }
 
-object AppViewModelStoreOwner : ViewModelStoreOwner {
-    override val viewModelStore: ViewModelStore = ViewModelStore()
+@Composable
+private fun RemindersUpdater(
+    viewModel: MainViewModel,
+    lastReminder: Reminder?,
+    shownReminders: SnapshotStateList<Reminder>
+) {
+    //expire old reminders on start
+    var lastReminder1 = lastReminder
+    LaunchedEffect(Unit) {
+        viewModel.viewModelScope.launch {
+            val reminders = viewModel.repository.getAllRemindersList()
+            val now = LocalDateTime.now(ZoneOffset.UTC)
+            val dueReminders = reminders.filter { reminder ->
+                !reminder.isCompleted && reminder.remindAt.isBefore(now.minusMinutes(4))
+            }
+            dueReminders.forEach { reminder ->
+                logMsg("Reminder updated: $reminder")
+                viewModel.repository.updateReminder(reminder.copy(isCompleted = true))
+            }
+        }
+    }
 
-    fun dispose() {
-        viewModelStore.clear()
+    //reminders check loop
+    LaunchedEffect(Unit) {
+        while (isActive) {
+            val now = LocalDateTime.now(ZoneOffset.UTC)
+            val dueReminders = viewModel.reminders.value.filter { reminder ->
+                !reminder.isCompleted && reminder.remindAt.isBefore(now) && reminder.remindAt.isAfter(
+                    now.minusMinutes(5)
+                )
+            }
+            dueReminders.forEach { reminder ->
+                viewModel.repository.updateReminder(reminder.copy(isCompleted = true))
+                logMsg("Reminder updated: $reminder")
+                if (isNotificationAllowed()) {
+                    logMsg("Showing reminder: $reminder")
+
+                    lastReminder1 = reminder
+                    shownReminders += reminder
+
+                    val lastThree = shownReminders.takeLast(3)
+                    shownReminders.clear()
+                    shownReminders += lastThree
+
+                    //auto hide reminder if hideReminderAfter > 0
+                    val lastReminder = lastReminder1
+                    if (lastReminder != null && viewModel.appSettings.value.hideReminderAfter > 0) {
+                        viewModel.viewModelScope.launch {
+                            delay(viewModel.appSettings.value.hideReminderAfter)
+                            shownReminders -= lastReminder
+                        }
+                    }
+                }
+            }
+            delay(15_000)
+        }
     }
 }

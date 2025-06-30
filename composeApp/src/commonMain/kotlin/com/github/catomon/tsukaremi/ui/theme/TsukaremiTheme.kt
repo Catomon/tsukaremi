@@ -9,7 +9,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import org.jetbrains.compose.resources.Font
 import tsukaremi.composeapp.generated.resources.BadComic_Regular
-import tsukaremi.composeapp.generated.resources.IndieFlower_Regular
 import tsukaremi.composeapp.generated.resources.Res
 
 
@@ -139,7 +138,7 @@ private val lightColorScheme = lightColorScheme(
 //    open val thumbnailProgressIndicator: Color = background.copy(0.5f),
 //    open val thinBorder: Color = background,
 //    open val buttonIconSmallSelected: Color = Color.White,
-    //    object Violet : KagaminColors(
+//    object Violet : KagaminColors(
 //        name = "gami-kasa",
 //        behindBackground = Color(0xffc09dff),
 //        listItem = Color(0xcd9775d5), // Color(0xcb6c4141)
@@ -232,4 +231,13 @@ fun TsukaremiTheme(
         content = content,
         typography = typography
     )
+}
+
+
+object TsukaremiTheme {
+    val colors = TsukaremiColors
+}
+
+object TsukaremiColors {
+    val background = darkColorScheme.background.copy(0.90f)
 }

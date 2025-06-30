@@ -2,13 +2,12 @@ package com.github.catomon.tsukaremi.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,15 +23,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.tsukaremi.data.local.AppSettings
+import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.util.openInBrowser
-import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
 import tsukaremi.composeapp.generated.resources.Res
 import tsukaremi.composeapp.generated.resources.lucky_background_stars
 import java.net.URI
-
-@Serializable
-object SettingsDestination
 
 @Composable
 fun SettingsScreen(
@@ -54,7 +50,7 @@ fun SettingsScreen(
 
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.matchParentSize().background(MaterialTheme.colorScheme.background.copy(0.75f))
+                modifier = Modifier.matchParentSize().background(TsukaremiTheme.colors.background)
             ) {
                 Column {
                     Column {
@@ -65,17 +61,17 @@ fun SettingsScreen(
                                 onSettingsChanged(settings.copy(hideReminderAfter = 0L))
                             })
 
-                            Text("5 sec.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp)
+                            Text("5 s.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp)
                             RadioButton(hideReminderAfterMillis == 5_000L, {
                                 onSettingsChanged(settings.copy(hideReminderAfter = 5_000L))
                             })
 
-                            Text("10 sec.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp)
+                            Text("10 s.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp)
                             RadioButton(hideReminderAfterMillis == 10_000L, {
                                 onSettingsChanged(settings.copy(hideReminderAfter = 10_000L))
                             })
 
-                            Text("15 sec.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp)
+                            Text("15 s.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp)
                             RadioButton(hideReminderAfterMillis == 15_000L, {
                                 onSettingsChanged(settings.copy(hideReminderAfter = 15_000L))
                             })
@@ -83,9 +79,14 @@ fun SettingsScreen(
                     }
                 }
 
-                Text("github.com/catomon", modifier = Modifier.align(Alignment.BottomCenter).padding(all = 6.dp).clickable {
+                OutlinedButton({
                     openInBrowser(URI.create("https://github.com/Catomon"))
-                }, fontSize = 12.sp)
+                }, modifier = Modifier.align(Alignment.BottomCenter).padding(all = 6.dp)) {
+                    Text(
+                        "github.com/catomon",
+                        fontSize = 12.sp
+                    )
+                }
             }
         }
     }

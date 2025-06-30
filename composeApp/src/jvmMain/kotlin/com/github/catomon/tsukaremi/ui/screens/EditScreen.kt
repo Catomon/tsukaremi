@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.components.DatePickerDialog
 import com.github.catomon.tsukaremi.ui.components.TimePickerDialog
+import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.ui.viewmodel.EditViewModel
 import com.github.catomon.tsukaremi.util.combineDateAndTime
 import com.github.catomon.tsukaremi.util.formatMillisToDateString
@@ -54,9 +55,6 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 
 typealias HoursMinutes = Pair<Int, Int>
-
-@Serializable
-data class EditDestination(val reminderId: Int? = null)
 
 private val defaultTimerRemindInTime = 0 to 0
 
@@ -148,7 +146,7 @@ fun EditScreen(
             colorFilter = ColorFilter.tint(Color(0xff9775d5))
         )
 
-        Column(Modifier.background(MaterialTheme.colorScheme.background.copy(0.75f))) {
+        Column(Modifier.background(TsukaremiTheme.colors.background)) {
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
