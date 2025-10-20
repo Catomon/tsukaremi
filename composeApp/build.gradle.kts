@@ -69,6 +69,8 @@ kotlin {
             @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.uiTest)
             implementation(libs.kotlinx.coroutines.test)
+            implementation(kotlin("test-annotations-common"))
+            implementation(":assertk:0.28.0")
         }
 
         androidMain.dependencies {
@@ -79,6 +81,9 @@ kotlin {
 
             implementation(libs.koin.android)
 //            implementation(libs.koin.androidx.navigation)
+
+            //       androidTestImplementation("androidx.compose.ui:ui-test-junit4:$compose_version")
+            //       debugImplementation("androidx.compose.ui:ui-test-manifest:$compose_version")
         }
 
         jvmMain.dependencies {
