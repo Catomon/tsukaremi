@@ -1,6 +1,8 @@
 package com.github.catomon.tsukaremi.ui.windows
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,6 +38,9 @@ import com.github.catomon.tsukaremi.util.canAlwaysOnTop
 import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
 import com.github.catomon.tsukaremi.util.toSimpleString
 import com.github.panpf.sketch.AsyncImage
+import org.jetbrains.compose.resources.painterResource
+import tsukaremi.composeapp.generated.resources.Res
+import tsukaremi.composeapp.generated.resources.repeat
 
 @Composable
 fun ReminderWindow(
@@ -103,12 +110,13 @@ private fun ReminderWindowContent(
         }
 
         if (reminder.isTimer)
-            TextButton(onRestart, modifier = Modifier.fillMaxHeight().width(24.dp)) {
-                Text("🔁", modifier = Modifier.offset((-8).dp))
+            Box(Modifier.fillMaxHeight().size(24.dp).clickable { onRestart() }, contentAlignment = Alignment.Center) {
+                Image(painterResource(Res.drawable.repeat), "Restart", modifier = Modifier.size(16.dp))
             }
 
-        TextButton(onDismiss, modifier = Modifier.fillMaxHeight().width(24.dp)) {
-            Text("X", modifier = Modifier.offset((-4).dp))
+
+        Box(Modifier.fillMaxHeight().size(24.dp).clickable { onDismiss() }, contentAlignment = Alignment.Center) {
+            Text("X")
         }
     }
 }

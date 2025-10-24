@@ -68,7 +68,7 @@ fun ApplicationScope.TsukaremiApp() =
 
         if (shownReminders.isNotEmpty())
             shownReminders.takeLast(3).reversed().forEachIndexed { i, reminder ->
-                key(reminder.id) {
+                key(reminder) {
                     ReminderWindow(
                         reminder,
                         state = remember(i) {
