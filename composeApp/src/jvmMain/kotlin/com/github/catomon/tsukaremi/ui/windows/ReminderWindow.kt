@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -24,6 +25,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,7 +45,9 @@ import com.github.catomon.tsukaremi.util.toSimpleString
 import com.github.panpf.sketch.AsyncImage
 import org.jetbrains.compose.resources.painterResource
 import tsukaremi.composeapp.generated.resources.Res
+import tsukaremi.composeapp.generated.resources.lucky_background_stars
 import tsukaremi.composeapp.generated.resources.repeat
+import tsukaremi.composeapp.generated.resources.top_bar_background
 
 @Composable
 fun ReminderWindow(
@@ -79,44 +86,54 @@ private fun ReminderWindowContent(
         playSound("se_mop.wav")
     }
 
-    Row {
-        AsyncImage("assets/c29282c9a734ccddb8a40b2f9eda555c.gif", contentDescription = null)
+    Box(Modifier.fillMaxSize()) {
+        Image(
+            painterResource(Res.drawable.lucky_background_stars),
+            null,
+            modifier.matchParentSize(),
+            contentScale = ContentScale.Crop,
+            colorFilter = ColorFilter.tint(Color(0xff9775d5))
+        )
 
-        Column(
-            Modifier.background(MaterialTheme.colorScheme.background.copy(0.9f)).weight(1f).padding(horizontal = 6.dp)
-        ) {
-            Text(
-                reminder.title,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1
-            )
-            Text(
-                reminder.description,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 3,
-                fontSize = 12.sp,
-                lineHeight = 20.sp
-            )
-            Spacer(Modifier.weight(1f))
-            Box(Modifier.fillMaxWidth()) {
+        Row(Modifier.background(MaterialTheme.colorScheme.background.copy(0.9f))) {
+            AsyncImage("assets/c29282c9a734ccddb8a40b2f9eda555c.gif", contentDescription = null)
+
+            Column(
+                Modifier.weight(1f).padding(horizontal = 6.dp)
+            ) {
                 Text(
-                    remember {
-                        reminder.remindAt.fromUtcToSystemZoned().toSimpleString()
-                    }, modifier = Modifier.align(Alignment.BottomStart),
+                    reminder.title,
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = 1, fontSize = 12.sp
+                    maxLines = 1
                 )
+                Text(
+                    reminder.description,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 3,
+                    fontSize = 12.sp,
+                    lineHeight = 20.sp
+                )
+                Spacer(Modifier.weight(1f))
+                Box(Modifier.fillMaxWidth()) {
+                    Text(
+                        remember {
+                            reminder.remindAt.fromUtcToSystemZoned().toSimpleString()
+                        }, modifier = Modifier.align(Alignment.BottomStart),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1, fontSize = 12.sp
+                    )
+                }
             }
-        }
 
-        if (reminder.isTimer)
-            Box(Modifier.fillMaxHeight().size(24.dp).clickable { onRestart() }, contentAlignment = Alignment.Center) {
-                Image(painterResource(Res.drawable.repeat), "Restart", modifier = Modifier.size(16.dp))
+            if (reminder.isTimer)
+                Box(Modifier.fillMaxHeight().size(24.dp).clickable { onRestart() }, contentAlignment = Alignment.Center) {
+                    Image(painterResource(Res.drawable.repeat), "Restart", modifier = Modifier.size(16.dp))
+                }
+
+
+            Box(Modifier.fillMaxHeight().size(24.dp).clickable { onDismiss() }, contentAlignment = Alignment.Center) {
+                Text("X")
             }
-
-
-        Box(Modifier.fillMaxHeight().size(24.dp).clickable { onDismiss() }, contentAlignment = Alignment.Center) {
-            Text("X")
         }
     }
 }
