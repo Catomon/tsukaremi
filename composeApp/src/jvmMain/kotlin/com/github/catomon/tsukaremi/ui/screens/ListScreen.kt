@@ -1,13 +1,18 @@
 package com.github.catomon.tsukaremi.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,6 +59,7 @@ import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.ui.util.rememberLazyListStateHijacker
 import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
 import com.github.catomon.tsukaremi.util.toSimpleString
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
@@ -155,10 +161,10 @@ fun ReminderListItem(
     onRestart: (Reminder) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
+    val isHovered = interactionSource.collectIsHoveredAsState()
 
-    Column(
+    Row(
         modifier = modifier
             .fillMaxWidth()
             .height(100.dp)
@@ -167,66 +173,74 @@ fun ReminderListItem(
             .padding(8.dp)
             .alpha(if (reminder.isCompleted) 0.75f else 1f)
             .hoverable(interactionSource),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column(Modifier.fillMaxWidth()) {
+        Column {
             Text(reminder.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(reminder.description, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
             Text(remember(reminder) {
                 reminder.remindAt.fromUtcToSystemZoned().toSimpleString()
             }, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.width(90.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                IconButton({
-                    onEdit(reminder)
-                }, modifier = Modifier.size(25.dp)) {
-                    Icon(painterResource(Res.drawable.pencil), null, modifier = Modifier.size(16.dp))
-                }
-
-                val scale = remember { androidx.compose.animation.core.Animatable(1f) }
-
-                if (reminder.isTimer)
-                    IconButton({
-                        coroutineScope.launch {
-                            scale.animateTo(
-                                1.25f,
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                    stiffness = Spring.StiffnessHigh
-                                )
-                            )
-
-                            scale.animateTo(
-                                1f,
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                    stiffness = Spring.StiffnessHigh
-                                )
-                            )
-                        }
-                        onRestart(reminder)
-                    }, modifier = Modifier.scale(scale.value).size(25.dp)) {
-                        Icon(painterResource(Res.drawable.repeat), null, modifier = Modifier.size(16.dp))
-                    }
-
-                IconButton({
-                    onRemove(reminder)
-                }, modifier = Modifier.size(25.dp)) {
-                    Icon(painterResource(Res.drawable.trash), null, modifier = Modifier.size(16.dp))
-                }
-            }
+        AnimatedVisibility(isHovered.value, enter = fadeIn(), exit = fadeOut()) {
+            RemItemButtons(onEdit, reminder, onRestart, onRemove)
         }
     }
+}
+
+@Composable
+private fun RemItemButtons(
+    onEdit: (Reminder) -> Unit,
+    reminder: Reminder,
+    onRestart: (Reminder) -> Unit,
+    onRemove: (Reminder) -> Unit
+) {
+    val coroutineScope = rememberCoroutineScope()
+
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.width(26.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            IconButton({
+                onEdit(reminder)
+            }, modifier = Modifier.size(25.dp)) {
+                Icon(painterResource(Res.drawable.pencil), null, modifier = Modifier.size(16.dp))
+            }
+
+            val scale = remember { Animatable(1f) }
+
+            if (reminder.isTimer)
+                IconButton({
+                    coroutineScope.launch {
+                        scale.animateTo(
+                            1.25f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessHigh
+                            )
+                        )
+
+                        scale.animateTo(
+                            1f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessHigh
+                            )
+                        )
+                    }
+                    onRestart(reminder)
+                }, modifier = Modifier.scale(scale.value).size(25.dp)) {
+                    Icon(painterResource(Res.drawable.repeat), null, modifier = Modifier.size(16.dp))
+                }
+
+            IconButton({
+                onRemove(reminder)
+            }, modifier = Modifier.size(25.dp)) {
+                Icon(painterResource(Res.drawable.trash), null, modifier = Modifier.size(16.dp))
+            }
+        }
 }

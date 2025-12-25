@@ -31,7 +31,7 @@ fun ApplicationScope.TsukaremiMainWindow(viewModel: MainViewModel, modifier: Mod
         onCloseRequest = ::exitApplication,
         icon = painterResource(Res.drawable.app_icon),
         undecorated = true,
-        resizable = false,
+        resizable = true,
         transparent = WindowConfig.isTransparent,
         alwaysOnTop = false
     ) {

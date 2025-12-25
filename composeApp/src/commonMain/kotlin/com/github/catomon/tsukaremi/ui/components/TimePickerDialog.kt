@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import com.github.catomon.tsukaremi.util.is24HrFormat
 import kotlinx.coroutines.delay
@@ -69,6 +70,7 @@ fun TimePickerDialog(
                 Text("Cancel")
             }
         },
+        modifier = Modifier.scale(0.75f)
     ) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth().padding(top = 32.dp)) {
             TimePicker(

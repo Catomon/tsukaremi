@@ -92,7 +92,7 @@ fun TsukaremiMainScreen(
             modifier = Modifier
                 .fillMaxWidth()
 //                .padding(horizontal = 6.dp)
-                .height(120.dp),
+                .height(100.dp),
         ) {
             Image(
                 painterResource(Res.drawable.top_bar_background),

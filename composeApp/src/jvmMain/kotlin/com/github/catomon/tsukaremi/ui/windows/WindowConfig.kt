@@ -6,8 +6,8 @@ import androidx.compose.ui.unit.dp
 object WindowConfig {
     val title: String = "Tsukaremi"
 
-    const val WIDTH = 400
-    const val HEIGHT = 700
+    const val WIDTH = 300
+    const val HEIGHT = 500
 
     val reminderWindowSize = DpSize(400.dp, 125.dp)
 
