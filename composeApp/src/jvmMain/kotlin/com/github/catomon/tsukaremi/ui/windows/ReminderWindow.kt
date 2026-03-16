@@ -25,7 +25,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -86,16 +88,25 @@ private fun ReminderWindowContent(
         playSound("se_mop.wav")
     }
 
-    Box(Modifier.fillMaxSize()) {
-        Image(
-            painterResource(Res.drawable.lucky_background_stars),
-            null,
-            modifier.matchParentSize(),
-            contentScale = ContentScale.Crop,
-            colorFilter = ColorFilter.tint(Color(0xff9775d5))
-        )
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(
+            TsukaremiTheme.colors.gradientStart,
+            TsukaremiTheme.colors.gradientEnd
+        ),
+        start = androidx.compose.ui.geometry.Offset.Zero,
+        end = androidx.compose.ui.geometry.Offset.Infinite
+    )
 
-        Row(Modifier.background(MaterialTheme.colorScheme.background.copy(0.9f))) {
+    Box(modifier.fillMaxSize().background(gradientBrush)) {
+//        Image(
+//            painterResource(Res.drawable.lucky_background_stars),
+//            null,
+//            Modifier.matchParentSize(),
+//            contentScale = ContentScale.Crop,
+//            colorFilter = ColorFilter.tint(Color(0x4d9775d5))
+//        )
+
+        Row {
             AsyncImage("assets/c29282c9a734ccddb8a40b2f9eda555c.gif", contentDescription = null)
 
             Column(

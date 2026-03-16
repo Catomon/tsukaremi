@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.ui.util.darken
 import com.github.catomon.tsukaremi.ui.windows.WindowConfig
 import org.jetbrains.skia.FilterBlurMode
@@ -24,12 +25,16 @@ import org.jetbrains.skia.MaskFilter
 @Composable
 fun Modifier.luckyWindowDecoration(): Modifier {
     val density = LocalDensity.current
-    val shadowColor = MaterialTheme.colorScheme.background.darken(0.7f)
+    val shadowColor = Color.White
     val glowColor = MaterialTheme.colorScheme.surfaceContainerLow
     return if (WindowConfig.isTransparent)
-        this.padding(8.dp).customShadow().clip(RoundedCornerShape(8.dp))
+        this.padding(8.dp)   .border(
+            width = 6.dp,
+            color = TsukaremiTheme.colors.border,
+            shape = RoundedCornerShape(8.dp)
+        ).customShadow(color = Color.White).clip(RoundedCornerShape(8.dp))
     else
-        this.blurredShadow(cornerRadius = 0.dp)
+        this.blurredShadow(cornerRadius = 0.dp, color = Color.White)
             .border(
                 width = 2.dp,
                 color = shadowColor,

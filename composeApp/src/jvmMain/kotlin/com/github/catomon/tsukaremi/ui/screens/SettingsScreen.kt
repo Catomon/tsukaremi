@@ -38,56 +38,55 @@ fun SettingsScreen(
 ) {
     val hideReminderAfterMillis by remember(settings) { mutableStateOf(settings.hideReminderAfter) }
 
-    Surface(modifier) {
-        Box(modifier = modifier.fillMaxSize()) {
-            Image(
-                painterResource(Res.drawable.lucky_background_stars),
-                null,
-                modifier.matchParentSize(),
-                contentScale = ContentScale.Crop,
-                colorFilter = ColorFilter.tint(Color(0xff9775d5))
-            )
+    Box(modifier = modifier.fillMaxSize()) {
+//            Image(
+//                painterResource(Res.drawable.lucky_background_stars),
+//                null,
+//                modifier.matchParentSize(),
+//                contentScale = ContentScale.Crop,
+//                colorFilter = ColorFilter.tint(Color(0xff9775d5))
+//            )
 
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.matchParentSize().background(TsukaremiTheme.colors.background)
-            ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.matchParentSize()
+        ) {
+            Column {
                 Column {
-                    Column {
-                        Text("Dismiss reminder after: ")
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("never", fontSize = 12.sp)
-                            RadioButton(hideReminderAfterMillis == 0L, {
-                                onSettingsChanged(settings.copy(hideReminderAfter = 0L))
-                            })
+                    Text("Dismiss reminder after: ")
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("never", fontSize = 12.sp)
+                        RadioButton(hideReminderAfterMillis == 0L, {
+                            onSettingsChanged(settings.copy(hideReminderAfter = 0L))
+                        })
 
-                            Text("5 s.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp)
-                            RadioButton(hideReminderAfterMillis == 5_000L, {
-                                onSettingsChanged(settings.copy(hideReminderAfter = 5_000L))
-                            })
+                        Text("5 s.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp)
+                        RadioButton(hideReminderAfterMillis == 5_000L, {
+                            onSettingsChanged(settings.copy(hideReminderAfter = 5_000L))
+                        })
 
-                            Text("10 s.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp)
-                            RadioButton(hideReminderAfterMillis == 10_000L, {
-                                onSettingsChanged(settings.copy(hideReminderAfter = 10_000L))
-                            })
+                        Text("10 s.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp)
+                        RadioButton(hideReminderAfterMillis == 10_000L, {
+                            onSettingsChanged(settings.copy(hideReminderAfter = 10_000L))
+                        })
 
-                            Text("15 s.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp)
-                            RadioButton(hideReminderAfterMillis == 15_000L, {
-                                onSettingsChanged(settings.copy(hideReminderAfter = 15_000L))
-                            })
-                        }
+                        Text("15 s.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp)
+                        RadioButton(hideReminderAfterMillis == 15_000L, {
+                            onSettingsChanged(settings.copy(hideReminderAfter = 15_000L))
+                        })
                     }
                 }
+            }
 
-                OutlinedButton({
-                    openInBrowser(URI.create("https://github.com/Catomon"))
-                }, modifier = Modifier.align(Alignment.BottomCenter).padding(all = 6.dp)) {
-                    Text(
-                        "github.com/catomon",
-                        fontSize = 12.sp
-                    )
-                }
+            OutlinedButton({
+                openInBrowser(URI.create("https://github.com/Catomon"))
+            }, modifier = Modifier.align(Alignment.BottomCenter).padding(all = 6.dp)) {
+                Text(
+                    "github.com/catomon",
+                    fontSize = 12.sp
+                )
             }
         }
+
     }
 }

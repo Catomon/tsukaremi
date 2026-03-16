@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -33,6 +34,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,17 +47,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
+import com.github.catomon.tsukaremi.ui.util.darken
 import com.github.catomon.tsukaremi.ui.util.rememberLazyListStateHijacker
 import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
 import com.github.catomon.tsukaremi.util.toSimpleString
@@ -88,25 +96,25 @@ fun ListScreen(
     val scrollbarAdapter = rememberScrollbarAdapter(listState)
 
     Box(modifier = modifier.fillMaxSize()) {
-        Image(
-            painterResource(Res.drawable.lucky_background_stars),
-            null,
-            modifier.matchParentSize(),
-            contentScale = ContentScale.Crop,
-            colorFilter = ColorFilter.tint(Color(0xff9775d5))
-        )
+//        Image(
+//            painterResource(Res.drawable.lucky_background_stars),
+//            null,
+//            modifier.matchParentSize(),
+//            contentScale = ContentScale.Crop,
+//            colorFilter = ColorFilter.tint(Color(0x4d9775d5))
+//        )
 
         Box(
             contentAlignment = Alignment.Center, modifier = Modifier
                 .matchParentSize()
-                .graphicsLayer {
-                    compositingStrategy = CompositingStrategy.Offscreen
-                }
-                .drawWithContent {
-                    drawContent()
-                    drawRect(TsukaremiTheme.colors.background, size = size, blendMode = BlendMode.SrcOut)
-                    drawContent()
-                }
+//                .graphicsLayer {
+//                    compositingStrategy = CompositingStrategy.Offscreen
+//                }
+//                .drawWithContent {
+//                    drawContent()
+//                    drawRect(TsukaremiTheme.colors.background, size = size, blendMode = BlendMode.SrcOut)
+//                    drawContent()
+//                }
         ) {
             LazyColumn(
                 state = listState,
@@ -164,12 +172,30 @@ fun ReminderListItem(
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered = interactionSource.collectIsHoveredAsState()
 
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(
+            TsukaremiTheme.colors.gradientStart.copy(alpha = 0.35f),
+            Color(0x00ff5dde)
+        ),
+        start = androidx.compose.ui.geometry.Offset.Zero,
+        end = androidx.compose.ui.geometry.Offset.Infinite
+    )
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(100.dp)
-            .padding(4.dp)
-            .background(color = MaterialTheme.colorScheme.inversePrimary.copy(0.75f), shape = RoundedCornerShape(8.dp))
+            .padding(vertical = 4.dp)
+            .background(
+                brush = gradientBrush,
+                shape = RoundedCornerShape(8.dp),
+            )
+//            .border(
+//                width = 3.dp,
+//                color = TsukaremiTheme.colors.background,
+//                shape = RoundedCornerShape(8.dp)
+//            )
+
             .padding(8.dp)
             .alpha(if (reminder.isCompleted) 0.75f else 1f)
             .hoverable(interactionSource),
@@ -177,11 +203,91 @@ fun ReminderListItem(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
-            Text(reminder.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(reminder.description, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(remember(reminder) {
-                reminder.remindAt.fromUtcToSystemZoned().toSimpleString()
-            }, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            // Title
+            Box {
+                Text(
+                    reminder.title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style =
+                        LocalTextStyle.current.merge(
+                            TextStyle(
+                                color =  TsukaremiTheme.colors.background.darken(),
+                                drawStyle = Stroke(
+                                    width = 6f,
+                                    join = StrokeJoin.Round
+                                )
+                            )
+
+                        )
+                )
+                Text(
+                    reminder.title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color.White
+                )
+            }
+
+// Description
+            Box {
+                Text(
+                    reminder.description,
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style =
+                        LocalTextStyle.current.merge(
+                            TextStyle(
+                                color =  TsukaremiTheme.colors.background.darken(),
+                                drawStyle = Stroke(
+                                    width = 4f,
+                                    join = StrokeJoin.Round
+                                )
+                            )
+
+                        )
+                )
+                Text(
+                    reminder.description,
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color.White
+                )
+            }
+
+// Date
+            Box {
+                remember(reminder) {
+                    reminder.remindAt.fromUtcToSystemZoned().toSimpleString()
+                }.let { text ->
+                    Text(
+                        text,
+                        fontSize = 12.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style =
+                            LocalTextStyle.current.merge(
+                                TextStyle(
+                                    color =  TsukaremiTheme.colors.background.darken(),
+                                    drawStyle = Stroke(
+                                        width = 4f,
+                                        join = StrokeJoin.Round
+                                    )
+                                )
+
+                            )
+                    )
+                    Text(
+                        text,
+                        fontSize = 12.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color.White
+                    )
+                }
+            }
         }
 
         AnimatedVisibility(isHovered.value, enter = fadeIn(), exit = fadeOut()) {
@@ -200,47 +306,48 @@ private fun RemItemButtons(
     val coroutineScope = rememberCoroutineScope()
 
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.width(26.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            IconButton({
-                onEdit(reminder)
-            }, modifier = Modifier.size(25.dp)) {
-                Icon(painterResource(Res.drawable.pencil), null, modifier = Modifier.size(16.dp))
-            }
-
-            val scale = remember { Animatable(1f) }
-
-            if (reminder.isTimer)
-                IconButton({
-                    coroutineScope.launch {
-                        scale.animateTo(
-                            1.25f,
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessHigh
-                            )
-                        )
-
-                        scale.animateTo(
-                            1f,
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessHigh
-                            )
-                        )
-                    }
-                    onRestart(reminder)
-                }, modifier = Modifier.scale(scale.value).size(25.dp)) {
-                    Icon(painterResource(Res.drawable.repeat), null, modifier = Modifier.size(16.dp))
-                }
-
-            IconButton({
-                onRemove(reminder)
-            }, modifier = Modifier.size(25.dp)) {
-                Icon(painterResource(Res.drawable.trash), null, modifier = Modifier.size(16.dp))
-            }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.width(26.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        IconButton({
+            onEdit(reminder)
+        }, modifier = Modifier.size(25.dp)) {
+            Icon(painterResource(Res.drawable.pencil), null, modifier = Modifier.size(16.dp), tint = TsukaremiTheme.colors.background.darken())
         }
+
+        val scale = remember { Animatable(1f) }
+
+        if (reminder.isTimer)
+            IconButton({
+                coroutineScope.launch {
+                    scale.animateTo(
+                        1.25f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessHigh
+                        )
+                    )
+
+                    scale.animateTo(
+                        1f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessHigh
+                        )
+                    )
+                }
+                onRestart(reminder)
+            }, modifier = Modifier.scale(scale.value).size(25.dp)) {
+                Icon(painterResource(Res.drawable.repeat), null, modifier = Modifier.size(16.dp),
+                    tint = TsukaremiTheme.colors.background.darken())
+            }
+
+        IconButton({
+            onRemove(reminder)
+        }, modifier = Modifier.size(25.dp)) {
+            Icon(painterResource(Res.drawable.trash), null, modifier = Modifier.size(16.dp), tint = TsukaremiTheme.colors.background.darken())
+        }
+    }
 }

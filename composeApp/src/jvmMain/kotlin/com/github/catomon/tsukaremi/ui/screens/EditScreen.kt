@@ -138,15 +138,15 @@ fun EditScreen(
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        Image(
-            painterResource(Res.drawable.lucky_background_stars),
-            null,
-            modifier.matchParentSize(),
-            contentScale = ContentScale.Crop,
-            colorFilter = ColorFilter.tint(Color(0xff9775d5))
-        )
+//        Image(
+//            painterResource(Res.drawable.lucky_background_stars),
+//            null,
+//            modifier.matchParentSize(),
+//            contentScale = ContentScale.Crop,
+//            colorFilter = ColorFilter.tint(Color(0xff9775d5))
+//        )
 
-        Column(Modifier.background(TsukaremiTheme.colors.background)) {
+        Column {
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },

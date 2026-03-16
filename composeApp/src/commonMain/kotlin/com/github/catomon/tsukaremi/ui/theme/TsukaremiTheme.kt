@@ -239,5 +239,15 @@ object TsukaremiTheme {
 }
 
 object TsukaremiColors {
-    val background = darkColorScheme.background.copy(0.90f)
+    val background = Color(0xfff39534)
+    val gradientStart = Color(0xfffd7849)
+    val gradientEnd = Color(0xfffbfd82)
+
+    val border =  Color(0xfff39534)
+
+
+    //    val border = darkColorScheme.background.copy(0.90f)
+//    val background = darkColorScheme.background.copy(0.90f)
+//    val gradientStart = darkColorScheme.background.copy(0.90f)
+//    val gradientEnd = Color(0xffff5dde)
 }
