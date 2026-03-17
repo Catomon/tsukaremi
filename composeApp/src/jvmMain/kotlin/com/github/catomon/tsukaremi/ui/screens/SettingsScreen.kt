@@ -1,7 +1,5 @@
 package com.github.catomon.tsukaremi.ui.screens
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,26 +7,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.tsukaremi.data.local.AppSettings
 import com.github.catomon.tsukaremi.ui.components.OutlinedText
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.util.openInBrowser
-import org.jetbrains.compose.resources.painterResource
-import tsukaremi.composeapp.generated.resources.Res
-import tsukaremi.composeapp.generated.resources.lucky_background_stars
 import java.net.URI
 
 @Composable
@@ -54,26 +44,41 @@ fun SettingsScreen(
         ) {
             Column {
                 Column {
-                    OutlinedText("Dismiss reminder after: ", outlineColor = TsukaremiTheme.colors.background)
+                    OutlinedText("Dismiss reminder after: ", outlineColor = TsukaremiTheme.colors.background,)
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedText("never", fontSize = 12.sp, outlineColor = TsukaremiTheme.colors.background)
+                        OutlinedText("never", outlineColor = TsukaremiTheme.colors.background, fontSize = 12.sp,)
                         RadioButton(hideReminderAfterMillis == 0L, {
                             onSettingsChanged(settings.copy(hideReminderAfter = 0L))
                         })
 
-                        OutlinedText("5 s.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp, outlineColor = TsukaremiTheme.colors.background)
+                        OutlinedText(
+                            "5 s.",
+                            outlineColor = TsukaremiTheme.colors.background,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(start = 6.dp),
+                        )
                         RadioButton(hideReminderAfterMillis == 5_000L, {
                             onSettingsChanged(settings.copy(hideReminderAfter = 5_000L))
                         })
                     }
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedText("10 s.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp, outlineColor = TsukaremiTheme.colors.background)
+                        OutlinedText(
+                            "10 s.",
+                            outlineColor = TsukaremiTheme.colors.background,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(start = 6.dp),
+                        )
                         RadioButton(hideReminderAfterMillis == 10_000L, {
                             onSettingsChanged(settings.copy(hideReminderAfter = 10_000L))
                         })
 
-                        OutlinedText("15 s.", modifier = Modifier.padding(start = 6.dp), fontSize = 12.sp, outlineColor = TsukaremiTheme.colors.background)
+                        OutlinedText(
+                            "15 s.",
+                            outlineColor = TsukaremiTheme.colors.background,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(start = 6.dp),
+                        )
                         RadioButton(hideReminderAfterMillis == 15_000L, {
                             onSettingsChanged(settings.copy(hideReminderAfter = 15_000L))
                         })
@@ -86,8 +91,8 @@ fun SettingsScreen(
             }, modifier = Modifier.align(Alignment.BottomCenter).padding(all = 6.dp)) {
                 OutlinedText(
                     "github.com/catomon",
+                    outlineColor = TsukaremiTheme.colors.background,
                     fontSize = 12.sp,
-                    outlineColor = TsukaremiTheme.colors.background
                 )
             }
         }

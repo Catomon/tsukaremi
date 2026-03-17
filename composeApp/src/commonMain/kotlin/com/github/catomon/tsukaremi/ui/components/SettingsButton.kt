@@ -5,6 +5,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import org.jetbrains.compose.resources.painterResource
@@ -19,6 +20,6 @@ fun SettingsButton(
 ) {
     IconButton(onClick, modifier = modifier) {
         Icon(painterResource(Res.drawable.settings_outline), null, modifier = Modifier.size(25.dp), tint = TsukaremiTheme.colors.characterColor)
-        Icon(painterResource(Res.drawable.settings), "Options", modifier = Modifier.size(25.dp))
+        Icon(painterResource(Res.drawable.settings), "Options", modifier = Modifier.size(25.dp), tint = Color.White)
     }
 }

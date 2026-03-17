@@ -21,9 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -140,6 +138,7 @@ fun TsukaremiMainScreen(
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.align(Alignment.TopEnd)) {
                     OutlinedText(
                         text = "Tsukaremi",
+                        outlineColor = TsukaremiTheme.colors.characterColor,
                         fontSize = 16.sp,
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
@@ -149,14 +148,13 @@ fun TsukaremiMainScreen(
                                 }
                             }
                             .padding(start = 12.dp),
-                        color = Color.White,
-                        outlineColor = TsukaremiTheme.colors.characterColor
                     )
 
                     Spacer(Modifier.weight(1f).height(40.dp))
 
                     OutlinedText(
                         text = "-",
+                        outlineColor = TsukaremiTheme.colors.characterColor,
                         fontSize = 16.sp,
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
@@ -164,12 +162,11 @@ fun TsukaremiMainScreen(
                                 window.isMinimized = true
                             }
                             .padding(horizontal = 12.dp),
-                        color = Color.White,
-                        outlineColor = TsukaremiTheme.colors.characterColor
                     )
 
                     OutlinedText(
                         text = "x",
+                        outlineColor = TsukaremiTheme.colors.characterColor,
                         fontSize = 16.sp,
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
@@ -177,8 +174,6 @@ fun TsukaremiMainScreen(
                                 exitApplication()
                             }
                             .padding(start = 12.dp, end = 24.dp),
-                        color = Color.White,
-                        outlineColor = TsukaremiTheme.colors.characterColor
                     )
                 }
 
@@ -301,7 +296,7 @@ fun MainScreenNavButton(
 
                                 )
                         )
-                        Text("Back to list")
+                        Text("Back to list", color = Color.White)
                     }
             }
         }
@@ -315,9 +310,10 @@ fun MainScreenNavButton(
             Box(Modifier.clickable {
                 navController.navigateUp()
             }.padding(end = 16.dp)) {
-                OutlinedText(text = "Save & return",
-                   outlineColor = TsukaremiTheme.colors.characterColor,
-                    color = Color.White)
+                OutlinedText(
+                    text = "Save & return",
+                    outlineColor = TsukaremiTheme.colors.characterColor,
+                )
             }
         }
     }

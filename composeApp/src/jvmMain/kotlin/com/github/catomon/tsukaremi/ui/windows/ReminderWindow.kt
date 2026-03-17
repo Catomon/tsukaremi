@@ -10,27 +10,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,8 +31,10 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
 import com.github.catomon.tsukaremi.domain.model.Reminder
+import com.github.catomon.tsukaremi.ui.components.OutlinedText
 import com.github.catomon.tsukaremi.ui.modifiers.luckyWindowDecoration
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
+import com.github.catomon.tsukaremi.ui.util.darken
 import com.github.catomon.tsukaremi.ui.util.playSound
 import com.github.catomon.tsukaremi.util.canAlwaysOnTop
 import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
@@ -47,9 +42,8 @@ import com.github.catomon.tsukaremi.util.toSimpleString
 import com.github.panpf.sketch.AsyncImage
 import org.jetbrains.compose.resources.painterResource
 import tsukaremi.composeapp.generated.resources.Res
-import tsukaremi.composeapp.generated.resources.lucky_background_stars
 import tsukaremi.composeapp.generated.resources.repeat
-import tsukaremi.composeapp.generated.resources.top_bar_background
+import tsukaremi.composeapp.generated.resources.repeat_outline
 
 @Composable
 fun ReminderWindow(
@@ -110,40 +104,60 @@ private fun ReminderWindowContent(
             AsyncImage("assets/c29282c9a734ccddb8a40b2f9eda555c.gif", contentDescription = null)
 
             Column(
-                Modifier.weight(1f).padding(horizontal = 6.dp)
+                Modifier.weight(1f).padding(horizontal = 6.dp, vertical = 12.dp)
             ) {
-                Text(
+                OutlinedText(
                     reminder.title,
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
+                    maxLines = 1, outlineColor = TsukaremiTheme.colors.background
                 )
-                Text(
+
+                OutlinedText(
                     reminder.description,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 3,
                     fontSize = 12.sp,
-                    lineHeight = 20.sp
+                    lineHeight = 20.sp, outlineColor = TsukaremiTheme.colors.background
                 )
-                Spacer(Modifier.weight(1f))
-                Box(Modifier.fillMaxWidth()) {
-                    Text(
-                        remember {
-                            reminder.remindAt.fromUtcToSystemZoned().toSimpleString()
-                        }, modifier = Modifier.align(Alignment.BottomStart),
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1, fontSize = 12.sp
-                    )
-                }
             }
 
-            if (reminder.isTimer)
-                Box(Modifier.fillMaxHeight().size(24.dp).clickable { onRestart() }, contentAlignment = Alignment.Center) {
-                    Image(painterResource(Res.drawable.repeat), "Restart", modifier = Modifier.size(16.dp))
+            Column(Modifier.fillMaxHeight().padding(end = 12.dp, top = 12.dp, bottom = 12.dp), horizontalAlignment = Alignment.End) {
+                Row {
+                    if (reminder.isTimer)
+                        Box(
+                            Modifier.size(24.dp).clickable { onRestart() },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painterResource(Res.drawable.repeat_outline), null, modifier = Modifier.size(22.dp),
+                                tint = TsukaremiTheme.colors.background
+                            )
+
+                            Icon(
+                                painterResource(Res.drawable.repeat), null, modifier = Modifier.size(16.dp),
+                                tint = Color.White
+                            )
+                        }
+
+
+                    Box(Modifier.size(24.dp).clickable { onDismiss() }, contentAlignment = Alignment.Center) {
+                        OutlinedText(
+                            text = "X",
+                            outlineColor = TsukaremiTheme.colors.background,
+                            fontSize = 16.sp
+                        )
+                    }
                 }
 
+                Spacer(Modifier.weight(1f))
 
-            Box(Modifier.fillMaxHeight().size(24.dp).clickable { onDismiss() }, contentAlignment = Alignment.Center) {
-                Text("X")
+                OutlinedText(
+                    remember {
+                        reminder.remindAt.fromUtcToSystemZoned().toSimpleString()
+                    },
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1, fontSize = 12.sp, outlineColor = TsukaremiTheme.colors.background
+                )
             }
         }
     }

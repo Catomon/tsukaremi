@@ -60,11 +60,16 @@ fun ApplicationScope.TsukaremiApp() =
         val shownReminders = remember { mutableStateListOf<Reminder>() }
         var lastReminder by remember { mutableStateOf<Reminder?>(null) }
 
+        var hideInTray by remember { mutableStateOf(false) }
+
         RemindersUpdater(viewModel, lastReminder, shownReminders)
 
-        Tray(icon = painterResource(Res.drawable.app_icon), state = trayState)
+        Tray(icon = painterResource(Res.drawable.app_icon), state = trayState, onAction = {
+            hideInTray = !hideInTray
+        })
 
-        TsukaremiMainWindow(viewModel)
+        if (!hideInTray)
+            TsukaremiMainWindow(viewModel)
 
         if (shownReminders.isNotEmpty())
             shownReminders.takeLast(3).reversed().forEachIndexed { i, reminder ->

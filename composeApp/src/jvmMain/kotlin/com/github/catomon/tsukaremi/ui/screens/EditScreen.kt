@@ -218,14 +218,14 @@ fun EditScreen(
                             showDatePickDialog = true
                         }, enabled = !isLoading, contentPadding = PaddingValues(16.dp)
                     ) {
-                        Text(
+                        OutlinedText(
                             remember(selectedDateMillis) {
                                 "Date:\n" + formatMillisToDateString(
                                     selectedDateMillis
                                 )
                             },
                             modifier = Modifier.sizeIn(minWidth = 96.dp),
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center, outlineColor = TsukaremiTheme.colors.background
                         )
                     }
 
@@ -234,28 +234,28 @@ fun EditScreen(
                         Button({
                             selectedTime = selectedTime.decrementTime(1)
                         }, enabled = !isLoading) {
-                            Text("-1")
+                            OutlinedText("-1", outlineColor = TsukaremiTheme.colors.background)
                         }
 
                         Button({
                             selectedTime = selectedTime.decrementTime(5)
                         }, enabled = !isLoading) {
-                            Text("-5")
+                            OutlinedText("-5", outlineColor = TsukaremiTheme.colors.background)
                         }
 
                         Button({
                             selectedTime = selectedTime.decrementTime(30)
                         }, enabled = !isLoading) {
-                            Text("-30")
+                            OutlinedText("-30", outlineColor = TsukaremiTheme.colors.background)
                         }
                     }
 
                 Button(
                     onClick = {
                         showTimePickDialog = true
-                    }, enabled = !isLoading, contentPadding = PaddingValues(16.dp)
+                    }, enabled = !isLoading, contentPadding = PaddingValues(16.dp),
                 ) {
-                    Text(
+                    OutlinedText(
                         remember(isTimer, selectedTime) {
                             if (isTimer) "Remind in:\n" + "%02d:%02d:00".format(
                                 selectedTime.first, selectedTime.second
@@ -264,7 +264,7 @@ fun EditScreen(
                             )
                         },
                         modifier = Modifier.sizeIn(minWidth = 60.dp),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center, outlineColor = TsukaremiTheme.colors.background
                     )
                 }
 
@@ -273,19 +273,19 @@ fun EditScreen(
                         Button({
                             selectedTime = selectedTime.incrementTime(1)
                         }, enabled = !isLoading) {
-                            Text("+1")
+                            OutlinedText("+1", outlineColor = TsukaremiTheme.colors.background)
                         }
 
                         Button({
                             selectedTime = selectedTime.incrementTime(5)
                         }, enabled = !isLoading) {
-                            Text("+5")
+                            OutlinedText("+5", outlineColor = TsukaremiTheme.colors.background)
                         }
 
                         Button({
                             selectedTime = selectedTime.incrementTime(30)
                         }, enabled = !isLoading) {
-                            Text("+30")
+                            OutlinedText("+30", outlineColor = TsukaremiTheme.colors.background)
                         }
                     }
             }

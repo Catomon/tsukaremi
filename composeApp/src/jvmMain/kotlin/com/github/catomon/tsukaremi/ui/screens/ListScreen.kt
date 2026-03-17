@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -206,7 +207,7 @@ fun ReminderListItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column(Modifier.padding(horizontal = 8.dp)) {
+        Column(Modifier.padding(horizontal = 8.dp).widthIn(100.dp, 200.dp)) {
             // Title
             Box {
                 Text(
@@ -294,7 +295,7 @@ fun ReminderListItem(
             }
         }
 
-        AnimatedVisibility(isHovered.value, enter = fadeIn(), exit = fadeOut()) {
+        AnimatedVisibility(isHovered.value, enter = fadeIn(), exit = fadeOut(), modifier = Modifier.width(26.dp)) {
             RemItemButtons(onEdit, reminder, onRestart, onRemove)
         }
     }
@@ -305,14 +306,15 @@ private fun RemItemButtons(
     onEdit: (Reminder) -> Unit,
     reminder: Reminder,
     onRestart: (Reminder) -> Unit,
-    onRemove: (Reminder) -> Unit
+    onRemove: (Reminder) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
 
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(26.dp),
+        modifier = modifier.width(26.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         IconButton({
