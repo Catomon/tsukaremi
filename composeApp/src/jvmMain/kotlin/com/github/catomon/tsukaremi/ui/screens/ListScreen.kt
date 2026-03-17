@@ -62,6 +62,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.tsukaremi.domain.model.Reminder
+import com.github.catomon.tsukaremi.ui.effect.Starfall
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.ui.util.darken
 import com.github.catomon.tsukaremi.ui.util.rememberLazyListStateHijacker
@@ -101,7 +102,7 @@ fun ListScreen(
 //            null,
 //            modifier.matchParentSize(),
 //            contentScale = ContentScale.Crop,
-//            colorFilter = ColorFilter.tint(Color(0x4d9775d5))
+//            colorFilter = ColorFilter.tint(Color(0x4dffffff))
 //        )
 
         Box(
@@ -128,17 +129,32 @@ fun ListScreen(
                 if (oldReminders.isNotEmpty()) {
                     item(null) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.inversePrimary.copy(0.75f),
-                                thickness = 2.dp,
-                                modifier = Modifier.padding(top = 20.dp)
-                            )
+                            Spacer(Modifier.height(20.dp))
 
-                            Text(
-                                "Expired",
-                                Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Center,
-                            )
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    "Expired",
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    style =
+                                        LocalTextStyle.current.merge(
+                                            TextStyle(
+                                                color = TsukaremiTheme.colors.background.darken(),
+                                                drawStyle = Stroke(
+                                                    width = 6f,
+                                                    join = StrokeJoin.Round
+                                                )
+                                            )
+
+                                        )
+                                )
+                                Text(
+                                    "Expired",
+                                    Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center,
+                                    color = Color.White
+                                )
+                            }
                         }
 
                     }

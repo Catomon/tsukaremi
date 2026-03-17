@@ -245,6 +245,7 @@ object TsukaremiColors {
 
     val border =  Color(0xfff39534)
 
+    val characterColor = Color(0xff6232a9)
 
     //    val border = darkColorScheme.background.copy(0.90f)
 //    val background = darkColorScheme.background.copy(0.90f)

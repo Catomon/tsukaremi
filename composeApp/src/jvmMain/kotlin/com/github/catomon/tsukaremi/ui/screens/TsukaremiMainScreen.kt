@@ -19,13 +19,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,7 +36,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -56,9 +53,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.github.catomon.tsukaremi.ui.components.OutlinedText
 import com.github.catomon.tsukaremi.ui.components.SettingsButton
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalNavController
 import com.github.catomon.tsukaremi.ui.compositionlocals.LocalWindow
+import com.github.catomon.tsukaremi.ui.effect.Starfall
 import com.github.catomon.tsukaremi.ui.navigation.EditDestination
 import com.github.catomon.tsukaremi.ui.navigation.ListDestination
 import com.github.catomon.tsukaremi.ui.navigation.SettingsDestination
@@ -67,12 +66,13 @@ import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.ui.util.darken
 import com.github.catomon.tsukaremi.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import tsukaremi.composeapp.generated.resources.Res
-import tsukaremi.composeapp.generated.resources.close_window
-import tsukaremi.composeapp.generated.resources.minimize_window
+import tsukaremi.composeapp.generated.resources.star
 import tsukaremi.composeapp.generated.resources.top_bar_background
+import tsukaremi.composeapp.generated.resources.tsukasa_sleepy
 import kotlin.system.exitProcess
 
 @Composable
@@ -104,107 +104,131 @@ fun TsukaremiMainScreen(
         end = androidx.compose.ui.geometry.Offset.Infinite
     )
 
-    Column(
+    Box(
         modifier = Modifier.fillMaxSize().background(gradientBrush),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-//                .padding(horizontal = 6.dp)
-                .height(100.dp),
+        Starfall(imageResource(Res.drawable.star))
+
+        Image(
+            painter = painterResource(Res.drawable.tsukasa_sleepy),
+            modifier = Modifier.align(Alignment.BottomEnd).offset(y = 20.dp),
+            contentDescription = null
+        )
+
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            Image(
-                painterResource(Res.drawable.top_bar_background),
-                null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize().clip(
-                    RoundedCornerShape(0.dp, 0.dp, 8.dp, 8.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+//                .padding(horizontal = 6.dp)
+                    .height(100.dp),
+            ) {
+                Image(
+                    painterResource(Res.drawable.top_bar_background),
+                    null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.matchParentSize().clip(
+                        RoundedCornerShape(0.dp, 0.dp, 8.dp, 8.dp)
+                    )
                 )
-            )
 
-            SettingsButton({
-                navigateToSettings(currentScreen, navController)
-            }, Modifier.align(Alignment.BottomStart))
+                SettingsButton({
+                    navigateToSettings(currentScreen, navController)
+                }, Modifier.align(Alignment.BottomStart))
 
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.align(Alignment.TopEnd)) {
-                Text(
-                    text = "Tsukaremi",
-                    fontSize = 16.sp,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable {
-                            navController.navigate(ListDestination) {
-                                launchSingleTop = true
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.align(Alignment.TopEnd)) {
+                    OutlinedText(
+                        text = "Tsukaremi",
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
+                                navController.navigate(ListDestination) {
+                                    launchSingleTop = true
+                                }
                             }
-                        }
-                        .padding(start = 12.dp)
-                )
+                            .padding(start = 12.dp),
+                        color = Color.White,
+                        outlineColor = TsukaremiTheme.colors.characterColor
+                    )
 
-                Spacer(Modifier.weight(1f))
+                    Spacer(Modifier.weight(1f).height(40.dp))
 
-                IconButton({
-                    window.isMinimized = true
-                }) {
-                    Icon(
-                        painterResource(Res.drawable.minimize_window),
-                        "Minimize window",
-                        modifier = Modifier.size(20.dp)
+                    OutlinedText(
+                        text = "-",
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
+                                window.isMinimized = true
+                            }
+                            .padding(horizontal = 12.dp),
+                        color = Color.White,
+                        outlineColor = TsukaremiTheme.colors.characterColor
+                    )
+
+                    OutlinedText(
+                        text = "x",
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
+                                exitApplication()
+                            }
+                            .padding(start = 12.dp, end = 24.dp),
+                        color = Color.White,
+                        outlineColor = TsukaremiTheme.colors.characterColor
                     )
                 }
 
-                IconButton({
-                    exitApplication()
-                }) {
-                    Icon(painterResource(Res.drawable.close_window), "Close window", modifier = Modifier.size(20.dp))
-                }
+                MainScreenNavButton(currentScreen, navController, Modifier.align(Alignment.Companion.BottomCenter))
             }
 
-            MainScreenNavButton(currentScreen, navController, Modifier.align(Alignment.Companion.BottomCenter))
-        }
-
-        CompositionLocalProvider(LocalNavController provides navController) {
-            NavHost(
-                navController = navController,
-                startDestination = ListDestination,
-                enterTransition = { slideInHorizontally { it } },
-                exitTransition = { slideOutHorizontally { -it } }
-            ) {
-                composable<ListDestination> {
-                    ListScreen(
-                        reminders = reminders,
-                        onEdit = {
-                            navController.navigate(EditDestination(it.id)) {
-                                launchSingleTop = true
+            CompositionLocalProvider(LocalNavController provides navController) {
+                NavHost(
+                    navController = navController,
+                    startDestination = ListDestination,
+                    enterTransition = { slideInHorizontally { it } },
+                    exitTransition = { slideOutHorizontally { -it } }
+                ) {
+                    composable<ListDestination> {
+                        ListScreen(
+                            reminders = reminders,
+                            onEdit = {
+                                navController.navigate(EditDestination(it.id)) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            onRestart = {
+                                viewModel.viewModelScope.launch {
+                                    viewModel.reminderManager.restartReminder(it)
+                                }
+                            },
+                            onDelete = {
+                                viewModel.viewModelScope.launch {
+                                    viewModel.reminderManager.cancelReminder(it)
+                                    viewModel.repository.deleteReminder(it)
+                                }
                             }
-                        },
-                        onRestart = {
-                            viewModel.viewModelScope.launch {
-                                viewModel.reminderManager.restartReminder(it)
-                            }
-                        },
-                        onDelete = {
-                            viewModel.viewModelScope.launch {
-                                viewModel.reminderManager.cancelReminder(it)
-                                viewModel.repository.deleteReminder(it)
-                            }
-                        }
-                    )
-                }
+                        )
+                    }
 
-                composable<EditDestination> {
-                    EditScreen(
-                        it.toRoute<EditDestination>().reminderId,
-                        onConfirm = navController::navigateUp
-                    )
-                }
+                    composable<EditDestination> {
+                        EditScreen(
+                            it.toRoute<EditDestination>().reminderId,
+                            onConfirm = navController::navigateUp
+                        )
+                    }
 
-                composable<SettingsDestination> {
-                    SettingsScreen(appSettings, {
-                        viewModel.updateSettings(it)
-                        viewModel.saveSettings()
-                    })
+                    composable<SettingsDestination> {
+                        SettingsScreen(appSettings, {
+                            viewModel.updateSettings(it)
+                            viewModel.saveSettings()
+                        })
+                    }
                 }
             }
         }
