@@ -6,10 +6,8 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -31,11 +29,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -44,39 +40,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.tsukaremi.domain.model.Reminder
-import com.github.catomon.tsukaremi.ui.effect.Starfall
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.ui.util.darken
 import com.github.catomon.tsukaremi.ui.util.rememberLazyListStateHijacker
 import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
 import com.github.catomon.tsukaremi.util.toSimpleString
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
 import tsukaremi.composeapp.generated.resources.Res
-import tsukaremi.composeapp.generated.resources.lucky_background_stars
 import tsukaremi.composeapp.generated.resources.pencil
+import tsukaremi.composeapp.generated.resources.pencil_outline
 import tsukaremi.composeapp.generated.resources.repeat
+import tsukaremi.composeapp.generated.resources.repeat_outline
 import tsukaremi.composeapp.generated.resources.trash
+import tsukaremi.composeapp.generated.resources.trash_outline
 import java.time.ZoneOffset
 
 @Composable
@@ -165,7 +153,7 @@ fun ListScreen(
                 }
 
                 item {
-                    Spacer(Modifier.height(64.dp))
+                    Spacer(Modifier.height(128.dp))
                 }
             }
 
@@ -218,7 +206,7 @@ fun ReminderListItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column {
+        Column(Modifier.padding(horizontal = 8.dp)) {
             // Title
             Box {
                 Text(
@@ -228,7 +216,7 @@ fun ReminderListItem(
                     style =
                         LocalTextStyle.current.merge(
                             TextStyle(
-                                color =  TsukaremiTheme.colors.background.darken(),
+                                color = TsukaremiTheme.colors.background.darken(),
                                 drawStyle = Stroke(
                                     width = 6f,
                                     join = StrokeJoin.Round
@@ -245,7 +233,7 @@ fun ReminderListItem(
                 )
             }
 
-// Description
+            // Description
             Box {
                 Text(
                     reminder.description,
@@ -255,7 +243,7 @@ fun ReminderListItem(
                     style =
                         LocalTextStyle.current.merge(
                             TextStyle(
-                                color =  TsukaremiTheme.colors.background.darken(),
+                                color = TsukaremiTheme.colors.background.darken(),
                                 drawStyle = Stroke(
                                     width = 4f,
                                     join = StrokeJoin.Round
@@ -273,7 +261,7 @@ fun ReminderListItem(
                 )
             }
 
-// Date
+            // Date
             Box {
                 remember(reminder) {
                     reminder.remindAt.fromUtcToSystemZoned().toSimpleString()
@@ -286,7 +274,7 @@ fun ReminderListItem(
                         style =
                             LocalTextStyle.current.merge(
                                 TextStyle(
-                                    color =  TsukaremiTheme.colors.background.darken(),
+                                    color = TsukaremiTheme.colors.background.darken(),
                                     drawStyle = Stroke(
                                         width = 4f,
                                         join = StrokeJoin.Round
@@ -330,7 +318,19 @@ private fun RemItemButtons(
         IconButton({
             onEdit(reminder)
         }, modifier = Modifier.size(25.dp)) {
-            Icon(painterResource(Res.drawable.pencil), null, modifier = Modifier.size(16.dp), tint = TsukaremiTheme.colors.background.darken())
+            Icon(
+                painterResource(Res.drawable.pencil_outline),
+                null,
+                modifier = Modifier.size(22.dp),
+                tint = TsukaremiTheme.colors.background.darken()
+            )
+
+            Icon(
+                painterResource(Res.drawable.pencil),
+                null,
+                modifier = Modifier.size(16.dp),
+                tint = Color.White
+            )
         }
 
         val scale = remember { Animatable(1f) }
@@ -356,14 +356,33 @@ private fun RemItemButtons(
                 }
                 onRestart(reminder)
             }, modifier = Modifier.scale(scale.value).size(25.dp)) {
-                Icon(painterResource(Res.drawable.repeat), null, modifier = Modifier.size(16.dp),
-                    tint = TsukaremiTheme.colors.background.darken())
+                Icon(
+                    painterResource(Res.drawable.repeat_outline), null, modifier = Modifier.size(22.dp),
+                    tint = TsukaremiTheme.colors.background.darken()
+                )
+
+                Icon(
+                    painterResource(Res.drawable.repeat), null, modifier = Modifier.size(16.dp),
+                    tint = Color.White
+                )
             }
 
         IconButton({
             onRemove(reminder)
         }, modifier = Modifier.size(25.dp)) {
-            Icon(painterResource(Res.drawable.trash), null, modifier = Modifier.size(16.dp), tint = TsukaremiTheme.colors.background.darken())
+            Icon(
+                painterResource(Res.drawable.trash_outline),
+                null,
+                modifier = Modifier.size(22.dp),
+                tint = TsukaremiTheme.colors.background.darken()
+            )
+
+            Icon(
+                painterResource(Res.drawable.trash),
+                null,
+                modifier = Modifier.size(16.dp),
+                tint = Color.White
+            )
         }
     }
 }

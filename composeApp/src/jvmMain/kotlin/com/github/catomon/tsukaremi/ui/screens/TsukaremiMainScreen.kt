@@ -27,7 +27,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -63,7 +62,6 @@ import com.github.catomon.tsukaremi.ui.navigation.ListDestination
 import com.github.catomon.tsukaremi.ui.navigation.SettingsDestination
 import com.github.catomon.tsukaremi.ui.navigation.navigateToSettings
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
-import com.github.catomon.tsukaremi.ui.util.darken
 import com.github.catomon.tsukaremi.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.imageResource
@@ -256,87 +254,73 @@ fun MainScreenNavButton(
                         .padding(4.dp).fillMaxWidth(),
                     contentAlignment = Alignment.Companion.BottomEnd,
                 ) {
-                    TextButton(
-                        onClick = {
-                            navController.navigate(EditDestination()) {
-                                launchSingleTop = true
-                            }
-                        },
-                        modifier = Modifier.background(
-                            color = TsukaremiTheme.colors.background.copy(alpha = 0.50f),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                    ) {
-                        Box {
-                            Text(
-                                "New Reminder",
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                style =
-                                    LocalTextStyle.current.merge(
-                                        TextStyle(
-                                            color = TsukaremiTheme.colors.background.darken(),
-                                            drawStyle = Stroke(
-                                                width = 6f,
-                                                join = StrokeJoin.Round
-                                            )
-                                        )
-
-                                    )
-                            )
-                            Text("New Reminder", color = Color.White)
+                    Box(Modifier.clickable {
+                        navController.navigate(EditDestination()) {
+                            launchSingleTop = true
                         }
+                    }.padding(end = 16.dp)) {
+                        Text(
+                            "Create",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style =
+                                LocalTextStyle.current.merge(
+                                    TextStyle(
+                                        color = TsukaremiTheme.colors.characterColor,
+                                        drawStyle = Stroke(
+                                            width = 6f,
+                                            join = StrokeJoin.Round
+                                        )
+                                    )
+
+                                )
+                        )
+                        Text("Create", color = Color.White)
                     }
                 }
             }
 
             EditDestination::class.qualifiedName -> {
-                Box(
-                    Modifier.Companion
-                        .padding(4.dp).fillMaxWidth(),
-                    contentAlignment = Alignment.Companion.BottomEnd
-                ) {
-                    TextButton(
-                        navController::navigateUp, shape = CircleShape,
-                        modifier = Modifier.background(
-                            color = TsukaremiTheme.colors.background.copy(alpha = 0.50f),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                    ) {
-                        Box {
-                            Text(
-                                "Back to list",
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                style =
-                                    LocalTextStyle.current.merge(
-                                        TextStyle(
-                                            color = TsukaremiTheme.colors.background.darken(),
-                                            drawStyle = Stroke(
-                                                width = 6f,
-                                                join = StrokeJoin.Round
-                                            )
+                Box(Modifier.padding(4.dp).fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
+                    Box(Modifier.clickable {
+                        navController.navigateUp()
+                    }.padding(end = 16.dp)) {
+                        Text(
+                            "Back to list",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style =
+                                LocalTextStyle.current.merge(
+                                    TextStyle(
+                                        color = TsukaremiTheme.colors.characterColor,
+                                        drawStyle = Stroke(
+                                            width = 6f,
+                                            join = StrokeJoin.Round
                                         )
-
                                     )
-                            )
-                            Text("Back to list")
-                        }
-                    }
-                }
-            }
 
-            SettingsDestination::class.qualifiedName -> {
-                Box(
-                    Modifier.Companion
-                        .padding(4.dp).fillMaxWidth(),
-                    contentAlignment = Alignment.Companion.BottomEnd
-                ) {
-                    Button(navController::navigateUp, shape = CircleShape) {
-                        Text("Save & return")
+                                )
+                        )
+                        Text("Back to list")
                     }
-                }
+            }
+        }
+
+        SettingsDestination::class.qualifiedName -> {
+        Box(
+            Modifier.Companion
+                .padding(4.dp).fillMaxWidth(),
+            contentAlignment = Alignment.Companion.BottomEnd
+        ) {
+            Box(Modifier.clickable {
+                navController.navigateUp()
+            }.padding(end = 16.dp)) {
+                OutlinedText(text = "Save & return",
+                   outlineColor = TsukaremiTheme.colors.characterColor,
+                    color = Color.White)
             }
         }
     }
+    }
+}
 }

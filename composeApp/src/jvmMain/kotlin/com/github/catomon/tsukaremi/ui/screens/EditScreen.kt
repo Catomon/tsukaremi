@@ -1,7 +1,5 @@
 package com.github.catomon.tsukaremi.ui.screens
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -29,12 +26,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.components.DatePickerDialog
+import com.github.catomon.tsukaremi.ui.components.OutlinedText
 import com.github.catomon.tsukaremi.ui.components.TimePickerDialog
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.ui.viewmodel.EditViewModel
@@ -42,11 +38,7 @@ import com.github.catomon.tsukaremi.util.combineDateAndTime
 import com.github.catomon.tsukaremi.util.formatMillisToDateString
 import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.serialization.Serializable
-import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
-import tsukaremi.composeapp.generated.resources.Res
-import tsukaremi.composeapp.generated.resources.lucky_background_stars
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -119,7 +111,8 @@ fun EditScreen(
                 val hrs = mnsTotal / 60
                 val mns = mnsTotal - hrs * 60
                 hrs.toInt() to mns.toInt()
-            } ?: (defaultTimerRemindInTime) else reminder?.remindAt?.fromUtcToSystemZoned()?.let { it.hour to it.minute } ?: LocalTime.now()
+            } ?: (defaultTimerRemindInTime) else reminder?.remindAt?.fromUtcToSystemZoned()
+                ?.let { it.hour to it.minute } ?: LocalTime.now()
                 .let { it.hour to it.minute })
     }
 
@@ -137,7 +130,7 @@ fun EditScreen(
         isLoading = false
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize().padding(horizontal = 16.dp)) {
 //        Image(
 //            painterResource(Res.drawable.lucky_background_stars),
 //            null,
@@ -160,9 +153,9 @@ fun EditScreen(
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
                     errorContainerColor = Color.Transparent,
-//                    unfocusedLabelColor = YukiTheme.colors.surface,
+                    unfocusedLabelColor = TsukaremiTheme.colors.gradientEnd,
 //                    focusedLabelColor = YukiTheme.colors.surface,
-//                    unfocusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = TsukaremiTheme.colors.gradientEnd,
 //                    focusedIndicatorColor = Color.Transparent
                 ),
                 maxLines = 1
@@ -181,9 +174,9 @@ fun EditScreen(
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
                     errorContainerColor = Color.Transparent,
-//                    unfocusedLabelColor = YukiTheme.colors.surface,
+                    unfocusedLabelColor = TsukaremiTheme.colors.gradientEnd,
 //                    focusedLabelColor = YukiTheme.colors.surface,
-//                    unfocusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = TsukaremiTheme.colors.gradientEnd,
 //                    focusedIndicatorColor = Color.Transparent
                 )
             )
@@ -191,7 +184,7 @@ fun EditScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(Modifier.height(1.dp).weight(0.2f))
 
-                Text("Alarm")
+                OutlinedText("Alarm", outlineColor = TsukaremiTheme.colors.background)
                 RadioButton(
                     !isTimer,
                     onClick = {
@@ -202,7 +195,7 @@ fun EditScreen(
 
                 Spacer(Modifier.height(1.dp).weight(0.2f))
 
-                Text("Timer")
+                OutlinedText("Timer", outlineColor = TsukaremiTheme.colors.background)
                 RadioButton(
                     isTimer,
                     onClick = {
@@ -223,7 +216,7 @@ fun EditScreen(
                     Button(
                         onClick = {
                             showDatePickDialog = true
-                        }, enabled = !isLoading, contentPadding = PaddingValues(32.dp)
+                        }, enabled = !isLoading, contentPadding = PaddingValues(16.dp)
                     ) {
                         Text(
                             remember(selectedDateMillis) {
@@ -260,7 +253,7 @@ fun EditScreen(
                 Button(
                     onClick = {
                         showTimePickDialog = true
-                    }, enabled = !isLoading, contentPadding = PaddingValues(32.dp)
+                    }, enabled = !isLoading, contentPadding = PaddingValues(16.dp)
                 ) {
                     Text(
                         remember(isTimer, selectedTime) {
@@ -270,13 +263,13 @@ fun EditScreen(
                                 selectedTime.first, selectedTime.second
                             )
                         },
-                        modifier = Modifier.sizeIn(minWidth = 96.dp),
+                        modifier = Modifier.sizeIn(minWidth = 60.dp),
                         textAlign = TextAlign.Center
                     )
                 }
 
                 if (isTimer)
-                    Column {
+                    Column(horizontalAlignment = Alignment.End) {
                         Button({
                             selectedTime = selectedTime.incrementTime(1)
                         }, enabled = !isLoading) {
@@ -335,7 +328,7 @@ fun EditScreen(
                     enabled = !isLoading,
                     modifier = Modifier.weight(0.40f)
                 ) {
-                    Text("CONFIRM")
+                    OutlinedText("CONFIRM", outlineColor = TsukaremiTheme.colors.background)
                 }
             }
         }
