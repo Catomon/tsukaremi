@@ -141,8 +141,12 @@ fun EditScreen(
 
         Column {
             OutlinedTextField(
-                value = title,
-                onValueChange = { title = it },
+                value = title + "\n" + description,
+                onValueChange = {
+                    val lines =  it.lines()
+                    title = lines.firstOrNull() ?: ""
+                    description = lines.takeLast(lines.size - 1).joinToString("\n")
+                },
                 label = { Text("Title") },
                 modifier = Modifier.fillMaxWidth().padding(4.dp),
                 enabled = !isLoading,
@@ -158,28 +162,28 @@ fun EditScreen(
                     unfocusedIndicatorColor = TsukaremiTheme.colors.gradientEnd,
 //                    focusedIndicatorColor = Color.Transparent
                 ),
-                maxLines = 1
+                maxLines = 4
             )
 
-            OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
-                label = { Text("Description") },
-                modifier = Modifier.fillMaxWidth().weight(1f).padding(4.dp),
-                enabled = !isLoading,
-                colors = TextFieldDefaults.colors(
-                    unfocusedTextColor = Color.White,
-                    focusedTextColor = Color.White,
-                    cursorColor = Color.White,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    errorContainerColor = Color.Transparent,
-                    unfocusedLabelColor = TsukaremiTheme.colors.gradientEnd,
-//                    focusedLabelColor = YukiTheme.colors.surface,
-                    unfocusedIndicatorColor = TsukaremiTheme.colors.gradientEnd,
-//                    focusedIndicatorColor = Color.Transparent
-                )
-            )
+//            OutlinedTextField(
+//                value = description,
+//                onValueChange = { description = it },
+//                label = { Text("Description") },
+//                modifier = Modifier.fillMaxWidth().weight(1f).padding(4.dp),
+//                enabled = !isLoading,
+//                colors = TextFieldDefaults.colors(
+//                    unfocusedTextColor = Color.White,
+//                    focusedTextColor = Color.White,
+//                    cursorColor = Color.White,
+//                    unfocusedContainerColor = Color.Transparent,
+//                    focusedContainerColor = Color.Transparent,
+//                    errorContainerColor = Color.Transparent,
+//                    unfocusedLabelColor = TsukaremiTheme.colors.gradientEnd,
+////                    focusedLabelColor = YukiTheme.colors.surface,
+//                    unfocusedIndicatorColor = TsukaremiTheme.colors.gradientEnd,
+////                    focusedIndicatorColor = Color.Transparent
+//                )
+//            )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(Modifier.height(1.dp).weight(0.2f))
@@ -253,7 +257,8 @@ fun EditScreen(
                 Button(
                     onClick = {
                         showTimePickDialog = true
-                    }, enabled = !isLoading, contentPadding = PaddingValues(16.dp),
+                    },
+                    enabled = !isLoading, contentPadding = PaddingValues(16.dp),
                 ) {
                     OutlinedText(
                         remember(isTimer, selectedTime) {

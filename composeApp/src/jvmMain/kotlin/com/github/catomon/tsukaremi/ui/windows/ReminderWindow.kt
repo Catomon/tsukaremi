@@ -3,6 +3,7 @@ package com.github.catomon.tsukaremi.ui.windows
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -122,10 +124,10 @@ private fun ReminderWindowContent(
             }
 
             Column(Modifier.fillMaxHeight().padding(end = 12.dp, top = 12.dp, bottom = 12.dp), horizontalAlignment = Alignment.End) {
-                Row {
+                Row(modifier  = Modifier.width(70.dp), horizontalArrangement = Arrangement.End) {
                     if (reminder.isTimer)
                         Box(
-                            Modifier.size(24.dp).clickable { onRestart() },
+                            Modifier.padding(end = 10.dp, top = 3.dp).clickable { onRestart() },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(

@@ -3,6 +3,7 @@ package com.github.catomon.tsukaremi.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
@@ -105,6 +106,8 @@ private fun RemindersUpdater(
     lastReminder: Reminder?,
     shownReminders: SnapshotStateList<Reminder>
 ) {
+    val reminders by viewModel.reminders.collectAsState()
+
     //expire old reminders on start
     var lastReminder1 = lastReminder
     LaunchedEffect(Unit) {
@@ -115,8 +118,9 @@ private fun RemindersUpdater(
                 !reminder.isCompleted && reminder.remindAt.isBefore(now.minusMinutes(4))
             }
             dueReminders.forEach { reminder ->
-                logMsg("Reminder updated: $reminder")
-                viewModel.repository.updateReminder(reminder.copy(isCompleted = true))
+                val updatedReminder = reminder.copy(isCompleted = true)
+                logMsg("Reminder updated: $updatedReminder")
+                viewModel.repository.updateReminder(updatedReminder)
             }
         }
     }
@@ -125,19 +129,20 @@ private fun RemindersUpdater(
     LaunchedEffect(Unit) {
         while (isActive) {
             val now = LocalDateTime.now(ZoneOffset.UTC)
-            val dueReminders = viewModel.reminders.value.filter { reminder ->
+            val dueReminders = reminders.filter { reminder ->
                 !reminder.isCompleted && reminder.remindAt.isBefore(now) && reminder.remindAt.isAfter(
                     now.minusMinutes(5)
                 )
             }
             dueReminders.forEach { reminder ->
-                viewModel.repository.updateReminder(reminder.copy(isCompleted = true))
-                logMsg("Reminder updated: $reminder")
+                val updatedReminder = reminder.copy(isCompleted = true)
+                viewModel.repository.updateReminder(updatedReminder)
+                logMsg("Reminder updated: $updatedReminder")
                 if (isNotificationAllowed()) {
-                    logMsg("Showing reminder: $reminder")
+                    logMsg("Showing reminder: $updatedReminder")
 
-                    lastReminder1 = reminder
-                    shownReminders += reminder
+                    lastReminder1 = updatedReminder
+                    shownReminders += updatedReminder
 
                     val lastThree = shownReminders.takeLast(3)
                     shownReminders.clear()
