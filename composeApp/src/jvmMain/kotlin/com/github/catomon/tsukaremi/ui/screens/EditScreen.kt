@@ -19,6 +19,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -92,6 +93,11 @@ fun EditScreen(
     var reminder by remember { mutableStateOf<Reminder?>(null) }
     var title by remember(reminder) { mutableStateOf(reminder?.title ?: "") }
     var description by remember(reminder) { mutableStateOf(reminder?.description ?: "") }
+    val titleAndDescriptionText by remember {
+        derivedStateOf {
+            title + "\n" + description
+        }
+    }
 
     var isTimer by remember(reminder) { mutableStateOf(reminder?.isTimer == true) }
 
@@ -141,14 +147,14 @@ fun EditScreen(
 
         Column {
             OutlinedTextField(
-                value = title + "\n" + description,
+                value = titleAndDescriptionText,
                 onValueChange = {
-                    val lines =  it.lines()
+                    val lines = it.lines()
                     title = lines.firstOrNull() ?: ""
                     description = lines.takeLast(lines.size - 1).joinToString("\n")
                 },
-                label = { Text("Title") },
-                modifier = Modifier.fillMaxWidth().padding(4.dp),
+                label = { Text("Title & Description") },
+                modifier = Modifier.fillMaxWidth().padding(4.dp).weight(1f),
                 enabled = !isLoading,
                 colors = TextFieldDefaults.colors(
                     unfocusedTextColor = Color.White,
@@ -162,7 +168,7 @@ fun EditScreen(
                     unfocusedIndicatorColor = TsukaremiTheme.colors.gradientEnd,
 //                    focusedIndicatorColor = Color.Transparent
                 ),
-                maxLines = 4
+                maxLines = 4,
             )
 
 //            OutlinedTextField(

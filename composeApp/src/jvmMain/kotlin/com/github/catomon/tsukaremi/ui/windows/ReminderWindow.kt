@@ -127,7 +127,7 @@ private fun ReminderWindowContent(
                 Row(modifier  = Modifier.width(70.dp), horizontalArrangement = Arrangement.End) {
                     if (reminder.isTimer)
                         Box(
-                            Modifier.padding(end = 10.dp, top = 3.dp).clickable { onRestart() },
+                            Modifier.padding(end = 10.dp, top = 2.dp).clickable { onRestart() },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
