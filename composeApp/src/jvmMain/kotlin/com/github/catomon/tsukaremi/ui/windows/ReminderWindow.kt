@@ -1,6 +1,5 @@
 package com.github.catomon.tsukaremi.ui.windows
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,22 +9,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,7 +32,6 @@ import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.components.OutlinedText
 import com.github.catomon.tsukaremi.ui.modifiers.luckyWindowDecoration
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
-import com.github.catomon.tsukaremi.ui.util.darken
 import com.github.catomon.tsukaremi.ui.util.playSound
 import com.github.catomon.tsukaremi.util.canAlwaysOnTop
 import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
@@ -93,7 +88,7 @@ private fun ReminderWindowContent(
         end = androidx.compose.ui.geometry.Offset.Infinite
     )
 
-    Box(modifier.fillMaxSize().background(gradientBrush)) {
+    Box(modifier.fillMaxSize().background(gradientBrush), contentAlignment = Alignment.Center) {
 //        Image(
 //            painterResource(Res.drawable.lucky_background_stars),
 //            null,
@@ -102,8 +97,13 @@ private fun ReminderWindowContent(
 //            colorFilter = ColorFilter.tint(Color(0x4d9775d5))
 //        )
 
-        Row {
-            AsyncImage("assets/c29282c9a734ccddb8a40b2f9eda555c.gif", contentDescription = null)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AsyncImage(
+                "assets/c29282c9a734ccddb8a40b2f9eda555c.gif",
+                contentDescription = null,
+                modifier = Modifier.size(100.dp),
+                contentScale = ContentScale.Crop
+            )
 
             Column(
                 Modifier.weight(1f).padding(horizontal = 6.dp, vertical = 12.dp)
@@ -123,8 +123,11 @@ private fun ReminderWindowContent(
                 )
             }
 
-            Column(Modifier.fillMaxHeight().padding(end = 12.dp, top = 12.dp, bottom = 12.dp), horizontalAlignment = Alignment.End) {
-                Row(modifier  = Modifier.width(70.dp), horizontalArrangement = Arrangement.End) {
+            Column(
+                Modifier.fillMaxHeight().padding(end = 12.dp, top = 12.dp, bottom = 12.dp),
+                horizontalAlignment = Alignment.End
+            ) {
+                Row(modifier = Modifier.width(70.dp), horizontalArrangement = Arrangement.End) {
                     if (reminder.isTimer)
                         Box(
                             Modifier.padding(end = 10.dp, top = 2.dp).clickable { onRestart() },

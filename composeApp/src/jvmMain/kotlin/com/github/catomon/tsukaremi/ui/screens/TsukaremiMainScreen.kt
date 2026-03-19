@@ -21,6 +21,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
@@ -74,7 +77,7 @@ import kotlin.system.exitProcess
 @Composable
 fun TsukaremiMainScreen(
     viewModel: MainViewModel = koinViewModel(),
-    exitApplication: () -> Unit = { exitProcess(0) },
+    onCloseRequest: () -> Unit = { exitProcess(0) },
     modifier: Modifier = Modifier
 ) = Surface(modifier = modifier) {
     val window = LocalWindow.current
@@ -164,17 +167,9 @@ fun TsukaremiMainScreen(
                             .padding(horizontal = 12.dp),
                     )
 
-                    OutlinedText(
-                        text = "x",
-                        outlineColor = TsukaremiTheme.colors.characterColor,
-                        fontSize = 16.sp,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable {
-                                exitApplication()
-                            }
-                            .padding(start = 12.dp, end = 24.dp),
-                    )
+                    HideInTrayButton(modifier = Modifier.padding( end = 12.dp)) {
+                        onCloseRequest()
+                    }
                 }
 
                 MainScreenNavButton(currentScreen, navController, Modifier.align(Alignment.Companion.BottomCenter))
@@ -229,6 +224,21 @@ fun TsukaremiMainScreen(
 }
 
 @Composable
+private fun HideInTrayButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Box(
+        modifier = modifier.size(14.dp)
+            .background(color = TsukaremiTheme.colors.characterColor, shape = CircleShape).clickable { onClick() }
+            .clip(RoundedCornerShape(8.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            Modifier.size(8.dp)
+                .background(color = Color.White, shape = CircleShape)
+        )
+    }
+}
+
+@Composable
 fun MainScreenNavButton(
     currentScreen: String?,
     navController: NavHostController,
@@ -253,9 +263,9 @@ fun MainScreenNavButton(
                         navController.navigate(EditDestination()) {
                             launchSingleTop = true
                         }
-                    }.padding(end = 16.dp)) {
+                    }.width(60.dp), contentAlignment = Alignment.Center) {
                         Text(
-                            "Create",
+                            "New",
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style =
@@ -270,7 +280,7 @@ fun MainScreenNavButton(
 
                                 )
                         )
-                        Text("Create", color = Color.White)
+                        Text("New", color = Color.White)
                     }
                 }
             }
@@ -279,9 +289,9 @@ fun MainScreenNavButton(
                 Box(Modifier.padding(4.dp).fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
                     Box(Modifier.clickable {
                         navController.navigateUp()
-                    }.padding(end = 16.dp)) {
+                    }.width(60.dp), contentAlignment = Alignment.Center) {
                         Text(
-                            "Back to list",
+                            "Back",
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style =
@@ -296,27 +306,27 @@ fun MainScreenNavButton(
 
                                 )
                         )
-                        Text("Back to list", color = Color.White)
+                        Text("Back", color = Color.White)
                     }
+                }
             }
-        }
 
-        SettingsDestination::class.qualifiedName -> {
-        Box(
-            Modifier.Companion
-                .padding(4.dp).fillMaxWidth(),
-            contentAlignment = Alignment.Companion.BottomEnd
-        ) {
-            Box(Modifier.clickable {
-                navController.navigateUp()
-            }.padding(end = 16.dp)) {
-                OutlinedText(
-                    text = "Save & return",
-                    outlineColor = TsukaremiTheme.colors.characterColor,
-                )
+            SettingsDestination::class.qualifiedName -> {
+                Box(
+                    Modifier.Companion
+                        .padding(4.dp).fillMaxWidth(),
+                    contentAlignment = Alignment.Companion.BottomEnd
+                ) {
+                    Box(Modifier.clickable {
+                        navController.navigateUp()
+                    }.width(60.dp), contentAlignment = Alignment.Center) {
+                        OutlinedText(
+                            text = "Save",
+                            outlineColor = TsukaremiTheme.colors.characterColor,
+                        )
+                    }
+                }
             }
         }
     }
-    }
-}
 }

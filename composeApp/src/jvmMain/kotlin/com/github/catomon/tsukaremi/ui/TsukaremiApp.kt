@@ -70,7 +70,9 @@ fun ApplicationScope.TsukaremiApp() =
         })
 
         if (!hideInTray)
-            TsukaremiMainWindow(viewModel)
+            TsukaremiMainWindow(viewModel, onCloseRequest = {
+                hideInTray = !hideInTray
+            })
 
         if (shownReminders.isNotEmpty())
             shownReminders.takeLast(3).reversed().forEachIndexed { i, reminder ->

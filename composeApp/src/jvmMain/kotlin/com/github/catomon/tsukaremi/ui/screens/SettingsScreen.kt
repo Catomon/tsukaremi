@@ -20,6 +20,7 @@ import com.github.catomon.tsukaremi.ui.components.OutlinedText
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.util.openInBrowser
 import java.net.URI
+import kotlin.system.exitProcess
 
 @Composable
 fun SettingsScreen(
@@ -44,9 +45,9 @@ fun SettingsScreen(
         ) {
             Column {
                 Column {
-                    OutlinedText("Dismiss reminder after: ", outlineColor = TsukaremiTheme.colors.background,)
+                    OutlinedText("Dismiss reminder after: ", outlineColor = TsukaremiTheme.colors.background)
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedText("never", outlineColor = TsukaremiTheme.colors.background, fontSize = 12.sp,)
+                        OutlinedText("never", outlineColor = TsukaremiTheme.colors.background, fontSize = 12.sp)
                         RadioButton(hideReminderAfterMillis == 0L, {
                             onSettingsChanged(settings.copy(hideReminderAfter = 0L))
                         })
@@ -86,14 +87,29 @@ fun SettingsScreen(
                 }
             }
 
-            OutlinedButton({
-                openInBrowser(URI.create("https://github.com/Catomon"))
-            }, modifier = Modifier.align(Alignment.BottomCenter).padding(all = 6.dp)) {
-                OutlinedText(
-                    "github.com/catomon",
-                    outlineColor = TsukaremiTheme.colors.background,
-                    fontSize = 12.sp,
-                )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            ) {
+                OutlinedButton({
+                    openInBrowser(URI.create("https://github.com/Catomon"))
+                }) {
+                    OutlinedText(
+                        "github.com/catomon",
+                        outlineColor = TsukaremiTheme.colors.background,
+                        fontSize = 12.sp,
+                    )
+                }
+
+                OutlinedButton({
+                    exitProcess(0)
+                }, modifier = Modifier.padding(all = 6.dp)) {
+                    OutlinedText(
+                        "Exit App",
+                        outlineColor = TsukaremiTheme.colors.background,
+                        fontSize = 12.sp,
+                    )
+                }
             }
         }
 
