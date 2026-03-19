@@ -30,6 +30,7 @@ import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.components.OutlinedText
+import com.github.catomon.tsukaremi.ui.effect.Starfall
 import com.github.catomon.tsukaremi.ui.modifiers.luckyWindowDecoration
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.ui.util.playSound
@@ -37,10 +38,12 @@ import com.github.catomon.tsukaremi.util.canAlwaysOnTop
 import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
 import com.github.catomon.tsukaremi.util.toSimpleString
 import com.github.panpf.sketch.AsyncImage
+import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
 import tsukaremi.composeapp.generated.resources.Res
 import tsukaremi.composeapp.generated.resources.repeat
 import tsukaremi.composeapp.generated.resources.repeat_outline
+import tsukaremi.composeapp.generated.resources.star
 
 @Composable
 fun ReminderWindow(
@@ -96,6 +99,8 @@ private fun ReminderWindowContent(
 //            contentScale = ContentScale.Crop,
 //            colorFilter = ColorFilter.tint(Color(0x4d9775d5))
 //        )
+
+        Starfall(imageResource(Res.drawable.star), fallDuration = 4000)
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             AsyncImage(

@@ -86,20 +86,20 @@ private data class Star(
     )
 )
 
-private suspend fun animateStar(star: Star) {
+private suspend fun animateStar(star: Star, fallDuration: Int = 12000) {
     star.y.snapTo(-0.1f - Random.nextFloat())
     star.y.animateTo(
         1.1f,
         initialVelocity = 0f,
         animationSpec = tween(
-            (12000 + 12000f * (Random.nextFloat() * 4f)).toInt(),
+            (fallDuration + fallDuration.toFloat() * (Random.nextFloat() * 4f)).toInt(),
             easing = LinearEasing
         )
     )
 }
 
 @Composable
-fun Starfall(image: ImageBitmap, modifier: Modifier = Modifier) {
+fun Starfall(image: ImageBitmap, modifier: Modifier = Modifier, fallDuration: Int = 12000) {
     Box(
         modifier = modifier
     ) {
@@ -133,7 +133,7 @@ fun Starfall(image: ImageBitmap, modifier: Modifier = Modifier) {
                 }
 
                 coroutineScope.launch(Dispatchers.Default) {
-                    animateStar(it)
+                    animateStar(it, fallDuration)
                 }
             }
 
@@ -141,7 +141,7 @@ fun Starfall(image: ImageBitmap, modifier: Modifier = Modifier) {
                 stars.forEach {
                     if (it.y.value >= 1.1f) {
                         coroutineScope.launch(Dispatchers.Default) {
-                            animateStar(it)
+                            animateStar(it, fallDuration)
                         }
                     }
                 }
