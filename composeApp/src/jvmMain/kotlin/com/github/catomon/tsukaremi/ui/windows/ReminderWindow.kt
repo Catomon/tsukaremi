@@ -1,28 +1,40 @@
 package com.github.catomon.tsukaremi.ui.windows
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -94,11 +106,27 @@ private fun ReminderWindowContent(
             TsukaremiTheme.colors.gradientStart,
             TsukaremiTheme.colors.gradientEnd
         ),
-        start = androidx.compose.ui.geometry.Offset.Zero,
-        end = androidx.compose.ui.geometry.Offset.Infinite
+        start = Offset.Zero,
+        end = Offset.Infinite
     )
 
-    Box(modifier.fillMaxSize().background(gradientBrush), contentAlignment = Alignment.Center) {
+    val gradientBrush2 = Brush.linearGradient(
+        colors = listOf(
+            TsukaremiTheme.colors.gradientStart.copy(alpha = 0.35f),
+            Color(0x00ff5dde)
+        ),
+        start = Offset.Zero,
+        end = Offset.Infinite
+    )
+
+    val interactionSource = remember { MutableInteractionSource() }
+
+    val isHovered by interactionSource.collectIsHoveredAsState()
+
+    Box(
+        modifier.fillMaxSize().background(gradientBrush).hoverable(interactionSource),
+        contentAlignment = Alignment.Center
+    ) {
 //        Image(
 //            painterResource(Res.drawable.lucky_background_stars),
 //            null,
@@ -109,16 +137,16 @@ private fun ReminderWindowContent(
 
         Starfall(imageResource(Res.drawable.star), fallDuration = 4000, starCount = 12)
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.background(gradientBrush2)) {
             AsyncImage(
                 "assets/c29282c9a734ccddb8a40b2f9eda555c.gif",
                 contentDescription = null,
-                modifier = Modifier.size(100.dp),
+                modifier = Modifier.size(96.dp),
                 contentScale = ContentScale.Crop
             )
 
             Column(
-                Modifier.weight(1f).padding(horizontal = 6.dp, vertical = 12.dp)
+                Modifier.weight(1f).padding(horizontal = 6.dp, vertical = 12.dp).verticalScroll(remember { ScrollState(0)})
             ) {
                 OutlinedText(
                     reminder.title,
@@ -126,58 +154,79 @@ private fun ReminderWindowContent(
                     maxLines = 1, outlineColor = TsukaremiTheme.colors.componentBorder
                 )
 
-                OutlinedText(
-                    reminder.description,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 3,
-                    fontSize = 12.sp,
-                    lineHeight = 20.sp, outlineColor = TsukaremiTheme.colors.componentBorder
-                )
+                if (reminder.description.isNotEmpty())
+                    OutlinedText(
+                        reminder.description,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 32,
+                        fontSize = 12.sp,
+                        lineHeight = 20.sp, outlineColor = TsukaremiTheme.colors.componentBorder
+                    )
             }
+        }
 
-            Column(
-                Modifier.fillMaxHeight().padding(end = 12.dp, top = 12.dp, bottom = 12.dp),
-                horizontalAlignment = Alignment.End
-            ) {
-                Row(modifier = Modifier.width(70.dp), horizontalArrangement = Arrangement.End) {
-                    if (reminder.isTimer)
-                        Box(
-                            Modifier.padding(end = 10.dp, top = 2.dp).clickable { onRestart() },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                painterResource(Res.drawable.repeat_outline), null, modifier = Modifier.size(22.dp),
-                                tint = TsukaremiTheme.colors.componentBorder
-                            )
+        DismissButton(onDismiss, Modifier.align(Alignment.TopEnd).padding(end = 12.dp, top = 12.dp))
 
-                            Icon(
-                                painterResource(Res.drawable.repeat), null, modifier = Modifier.size(16.dp),
-                                tint = Color.White
-                            )
-                        }
+        Box(
+            modifier = Modifier.fillMaxHeight().padding(end = 6.dp, top = 12.dp, bottom = 12.dp).align(Alignment.BottomEnd),
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            AnimatedContent(isHovered, transitionSpec = {
+                (fadeIn(animationSpec = tween(220, delayMillis = 90)))
+                    .togetherWith(fadeOut(animationSpec = tween(90)))
+            }, modifier = Modifier.width(50.dp), contentAlignment = Alignment.CenterEnd) { isHovered ->
+                if (isHovered && reminder.isTimer) {
+                    Box(
+                        Modifier.clickable { onRestart() }.offset(9.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painterResource(Res.drawable.repeat_outline),
+                            null,
+                            modifier = Modifier.size(22.dp),
+                            tint = TsukaremiTheme.colors.background
+                        )
 
-
-                    Box(Modifier.size(24.dp).clickable { onDismiss() }, contentAlignment = Alignment.Center) {
-                        OutlinedText(
-                            text = "X",
-                            outlineColor = TsukaremiTheme.colors.componentBorder,
-                            fontSize = 16.sp
+                        Icon(
+                            painterResource(Res.drawable.repeat), null, modifier = Modifier.size(16.dp),
+                            tint = Color.White
                         )
                     }
+                } else {
+                    OutlinedText(
+                        remember {
+                            reminder.remindAt.fromUtcToSystemZoned().toSimpleString().split(" ").lastOrNull() ?: ""
+                        },
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1, fontSize = 12.sp, outlineColor = TsukaremiTheme.colors.background
+                    )
                 }
-
-                Spacer(Modifier.weight(1f))
-
-                OutlinedText(
-                    remember {
-                        reminder.remindAt.fromUtcToSystemZoned().toSimpleString()
-                    },
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1, fontSize = 12.sp, outlineColor = TsukaremiTheme.colors.componentBorder
-                )
             }
         }
     }
+}
+
+@Composable
+private fun DismissButton(onDismiss: () -> Unit, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.size(14.dp)
+            .background(color = TsukaremiTheme.colors.background, shape = CircleShape).clickable { onDismiss() }
+            .clip(RoundedCornerShape(8.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            Modifier.size(8.dp)
+                .background(color = Color.White, shape = CircleShape)
+        )
+    }
+
+//    Box(Modifier.size(24.dp).clickable { onDismiss() }, contentAlignment = Alignment.Center) {
+//        OutlinedText(
+//            text = "X",
+//            outlineColor = TsukaremiTheme.colors.componentBorder,
+//            fontSize = 16.sp
+//        )
+//    }
 }
 
 @Composable
