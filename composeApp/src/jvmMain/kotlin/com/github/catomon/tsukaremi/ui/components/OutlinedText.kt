@@ -20,7 +20,7 @@ fun OutlinedText(
     color: Color = Color.White,
     outlineColor: Color = Color.Black,
     fontSize: TextUnit = TextUnit.Unspecified,
-    outlineSize: Float = 6f,
+    outlineSize: Float = 4f,
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
     maxLines: Int = Int.MAX_VALUE,

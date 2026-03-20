@@ -52,8 +52,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.tsukaremi.domain.model.Reminder
+import com.github.catomon.tsukaremi.ui.components.OutlinedText
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
-import com.github.catomon.tsukaremi.ui.util.darken
 import com.github.catomon.tsukaremi.ui.util.rememberLazyListStateHijacker
 import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
 import com.github.catomon.tsukaremi.util.toSimpleString
@@ -120,29 +120,14 @@ fun ListScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Spacer(Modifier.height(20.dp))
 
-                            Box(contentAlignment = Alignment.Center) {
-                                Text(
+                            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+                                OutlinedText(
                                     "Expired",
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
-                                    style =
-                                        LocalTextStyle.current.merge(
-                                            TextStyle(
-                                                color = TsukaremiTheme.colors.background.darken(),
-                                                drawStyle = Stroke(
-                                                    width = 6f,
-                                                    join = StrokeJoin.Round
-                                                )
-                                            )
-
-                                        )
-                                )
-                                Text(
-                                    "Expired",
-                                    Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Center,
-                                    color = Color.White
-                                )
+                                    outlineColor = TsukaremiTheme.colors.componentBorder,
+                                    outlineSize = 4f,
+                                    )
                             }
                         }
 
@@ -209,89 +194,36 @@ fun ReminderListItem(
     ) {
         Column(Modifier.padding(horizontal = 8.dp).widthIn(100.dp, 200.dp)) {
             // Title
-            Box {
-                Text(
-                    reminder.title,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style =
-                        LocalTextStyle.current.merge(
-                            TextStyle(
-                                color = TsukaremiTheme.colors.background.darken(),
-                                drawStyle = Stroke(
-                                    width = 6f,
-                                    join = StrokeJoin.Round
-                                )
-                            )
-
-                        )
-                )
-                Text(
-                    reminder.title,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.White
-                )
-            }
+            OutlinedText(
+                reminder.title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                outlineSize = 4f,
+                outlineColor = TsukaremiTheme.colors.componentBorder
+            )
 
             // Description
-            Box {
-                Text(
-                    reminder.description,
-                    fontSize = 12.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style =
-                        LocalTextStyle.current.merge(
-                            TextStyle(
-                                color = TsukaremiTheme.colors.background.darken(),
-                                drawStyle = Stroke(
-                                    width = 4f,
-                                    join = StrokeJoin.Round
-                                )
-                            )
-
-                        )
-                )
-                Text(
-                    reminder.description,
-                    fontSize = 12.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.White
-                )
-            }
+            OutlinedText(
+                reminder.description,
+                fontSize = 12.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                outlineSize = 4f,
+                outlineColor = TsukaremiTheme.colors.componentBorder
+            )
 
             // Date
-            Box {
-                remember(reminder) {
-                    reminder.remindAt.fromUtcToSystemZoned().toSimpleString()
-                }.let { text ->
-                    Text(
-                        text,
-                        fontSize = 12.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style =
-                            LocalTextStyle.current.merge(
-                                TextStyle(
-                                    color = TsukaremiTheme.colors.background.darken(),
-                                    drawStyle = Stroke(
-                                        width = 4f,
-                                        join = StrokeJoin.Round
-                                    )
-                                )
-
-                            )
-                    )
-                    Text(
-                        text,
-                        fontSize = 12.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Color.White
-                    )
-                }
+            remember(reminder) {
+                reminder.remindAt.fromUtcToSystemZoned().toSimpleString()
+            }.let { text ->
+                OutlinedText(
+                    text,
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    outlineSize = 4f,
+                    outlineColor = TsukaremiTheme.colors.componentBorder
+                )
             }
         }
 
@@ -324,7 +256,7 @@ private fun RemItemButtons(
                 painterResource(Res.drawable.pencil_outline),
                 null,
                 modifier = Modifier.size(22.dp),
-                tint = TsukaremiTheme.colors.background.darken()
+                tint = TsukaremiTheme.colors.componentBorder
             )
 
             Icon(
@@ -360,7 +292,7 @@ private fun RemItemButtons(
             }, modifier = Modifier.scale(scale.value).size(25.dp)) {
                 Icon(
                     painterResource(Res.drawable.repeat_outline), null, modifier = Modifier.size(22.dp),
-                    tint = TsukaremiTheme.colors.background.darken()
+                    tint = TsukaremiTheme.colors.componentBorder
                 )
 
                 Icon(
@@ -376,7 +308,7 @@ private fun RemItemButtons(
                 painterResource(Res.drawable.trash_outline),
                 null,
                 modifier = Modifier.size(22.dp),
-                tint = TsukaremiTheme.colors.background.darken()
+                tint = TsukaremiTheme.colors.componentBorder
             )
 
             Icon(

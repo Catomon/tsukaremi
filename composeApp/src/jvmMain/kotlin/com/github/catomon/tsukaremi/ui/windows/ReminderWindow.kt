@@ -1,6 +1,7 @@
 package com.github.catomon.tsukaremi.ui.windows
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,16 +13,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,7 +37,8 @@ import androidx.compose.ui.window.rememberWindowState
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.components.OutlinedText
 import com.github.catomon.tsukaremi.ui.effect.Starfall
-import com.github.catomon.tsukaremi.ui.modifiers.luckyWindowDecoration
+import com.github.catomon.tsukaremi.ui.modifiers.blurredShadow
+import com.github.catomon.tsukaremi.ui.modifiers.customShadow
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
 import com.github.catomon.tsukaremi.ui.util.playSound
 import com.github.catomon.tsukaremi.util.canAlwaysOnTop
@@ -76,7 +83,7 @@ private fun ReminderWindowContent(
     onRestart: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
-) = Surface(modifier.luckyWindowDecoration()) {
+) = Surface(modifier.luckyReminderWindowDecoration()) {
 
     LaunchedEffect(Unit) {
         playSound("se_mop.wav")
@@ -100,7 +107,7 @@ private fun ReminderWindowContent(
 //            colorFilter = ColorFilter.tint(Color(0x4d9775d5))
 //        )
 
-        Starfall(imageResource(Res.drawable.star), fallDuration = 4000)
+        Starfall(imageResource(Res.drawable.star), fallDuration = 4000, starCount = 12)
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             AsyncImage(
@@ -116,7 +123,7 @@ private fun ReminderWindowContent(
                 OutlinedText(
                     reminder.title,
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = 1, outlineColor = TsukaremiTheme.colors.background
+                    maxLines = 1, outlineColor = TsukaremiTheme.colors.componentBorder
                 )
 
                 OutlinedText(
@@ -124,7 +131,7 @@ private fun ReminderWindowContent(
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 3,
                     fontSize = 12.sp,
-                    lineHeight = 20.sp, outlineColor = TsukaremiTheme.colors.background
+                    lineHeight = 20.sp, outlineColor = TsukaremiTheme.colors.componentBorder
                 )
             }
 
@@ -140,7 +147,7 @@ private fun ReminderWindowContent(
                         ) {
                             Icon(
                                 painterResource(Res.drawable.repeat_outline), null, modifier = Modifier.size(22.dp),
-                                tint = TsukaremiTheme.colors.background
+                                tint = TsukaremiTheme.colors.componentBorder
                             )
 
                             Icon(
@@ -153,7 +160,7 @@ private fun ReminderWindowContent(
                     Box(Modifier.size(24.dp).clickable { onDismiss() }, contentAlignment = Alignment.Center) {
                         OutlinedText(
                             text = "X",
-                            outlineColor = TsukaremiTheme.colors.background,
+                            outlineColor = TsukaremiTheme.colors.componentBorder,
                             fontSize = 16.sp
                         )
                     }
@@ -166,9 +173,38 @@ private fun ReminderWindowContent(
                         reminder.remindAt.fromUtcToSystemZoned().toSimpleString()
                     },
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = 1, fontSize = 12.sp, outlineColor = TsukaremiTheme.colors.background
+                    maxLines = 1, fontSize = 12.sp, outlineColor = TsukaremiTheme.colors.componentBorder
                 )
             }
         }
     }
+}
+
+@Composable
+fun Modifier.luckyReminderWindowDecoration(): Modifier {
+    val density = LocalDensity.current
+    val shadowColor = Color.White
+    val glowColor = MaterialTheme.colorScheme.surfaceContainerLow
+    val borderGradient = Brush.horizontalGradient(
+        0.0f to TsukaremiTheme.colors.windowBorderGradientStart,
+        0.15f to TsukaremiTheme.colors.windowBorderGradientStart,
+        0.5f to TsukaremiTheme.colors.windowBorderGradientEnd,
+        1.0f to TsukaremiTheme.colors.windowBorderGradientEnd,
+    )
+
+    return if (WindowConfig.isTransparent)
+        this.padding(8.dp)
+            .border(
+                width = 4.dp,
+                brush = borderGradient,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .customShadow(color = Color.White).clip(RoundedCornerShape(8.dp))
+    else
+        this.blurredShadow(cornerRadius = 0.dp, color = Color.White)
+            .border(
+                width = 2.dp,
+                color = shadowColor,
+                shape = RectangleShape
+            )
 }

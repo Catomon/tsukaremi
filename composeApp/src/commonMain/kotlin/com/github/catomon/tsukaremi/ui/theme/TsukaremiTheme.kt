@@ -7,6 +7,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import com.github.catomon.tsukaremi.ui.util.darken
 import org.jetbrains.compose.resources.Font
 import tsukaremi.composeapp.generated.resources.BadComic_Regular
 import tsukaremi.composeapp.generated.resources.Res
@@ -185,9 +186,9 @@ private val darkColorScheme = darkColorScheme(
     surfaceBright = SurfaceBrightDark,
     surfaceContainerLowest = Color(0xff6232a9),
     surfaceContainerLow = Color(0xfffdeb9e),
-    surfaceContainer = SurfaceContainerDark,
-    surfaceContainerHigh = SurfaceContainerHighDark,
-    surfaceContainerHighest = SurfaceContainerHighestDark,
+    surfaceContainer = Color(0xfff39534).darken(),
+    surfaceContainerHigh = Color(0xff6232a9),
+    surfaceContainerHighest = Color(0xff6232a9).darken(),
 )
 
 val fontFamily @Composable get() = FontFamily(Font(Res.font.BadComic_Regular))
@@ -243,9 +244,12 @@ object TsukaremiColors {
     val gradientStart = Color(0xfffd7849)
     val gradientEnd = Color(0xfffbfd82)
 
-    val border =  Color(0xfff39534)
+    val componentBorder =  Color(0xfff39534).darken()
 
-    val characterColor = Color(0xff6232a9)
+    val windowBorderGradientStart =   Color(0xff7f57c6)
+    val windowBorderGradientEnd =   Color(0xfff39534)
+
+    val characterColor = Color(0xff7f57c6)
 
     //    val border = darkColorScheme.background.copy(0.90f)
 //    val background = darkColorScheme.background.copy(0.90f)

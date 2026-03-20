@@ -93,7 +93,7 @@ fun EditScreen(
     var reminder by remember { mutableStateOf<Reminder?>(null) }
     var title by remember(reminder) { mutableStateOf(reminder?.title ?: "") }
     var description by remember(reminder) { mutableStateOf(reminder?.description ?: "") }
-    val titleAndDescriptionText by remember {
+    val titleAndDescriptionText by remember(reminder) {
         derivedStateOf {
             title + "\n" + description
         }

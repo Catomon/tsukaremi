@@ -9,7 +9,7 @@ object WindowConfig {
     const val WIDTH = 300
     const val HEIGHT = 500
 
-    val reminderWindowSize = DpSize(350.dp, 125.dp)
+    val reminderWindowSize = DpSize(350.dp, 123.dp)
 
     var isTransparent = true
 

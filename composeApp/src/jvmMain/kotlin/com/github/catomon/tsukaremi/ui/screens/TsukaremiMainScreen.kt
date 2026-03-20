@@ -63,6 +63,7 @@ import com.github.catomon.tsukaremi.ui.navigation.ListDestination
 import com.github.catomon.tsukaremi.ui.navigation.SettingsDestination
 import com.github.catomon.tsukaremi.ui.navigation.navigateToSettings
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
+import com.github.catomon.tsukaremi.ui.util.darken
 import com.github.catomon.tsukaremi.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.imageResource
@@ -165,6 +166,7 @@ fun TsukaremiMainScreen(
                                 window.isMinimized = true
                             }
                             .padding(horizontal = 12.dp),
+                        outlineSize = 6f
                     )
 
                     HideInTrayButton(modifier = Modifier.padding( end = 12.dp)) {
@@ -264,23 +266,13 @@ fun MainScreenNavButton(
                             launchSingleTop = true
                         }
                     }.width(60.dp), contentAlignment = Alignment.Center) {
-                        Text(
+                        OutlinedText(
                             "New",
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            style =
-                                LocalTextStyle.current.merge(
-                                    TextStyle(
-                                        color = TsukaremiTheme.colors.characterColor,
-                                        drawStyle = Stroke(
-                                            width = 6f,
-                                            join = StrokeJoin.Round
-                                        )
-                                    )
-
-                                )
+                           outlineColor = TsukaremiTheme.colors.characterColor,
+                            outlineSize = 4f
                         )
-                        Text("New", color = Color.White)
                     }
                 }
             }
@@ -290,23 +282,12 @@ fun MainScreenNavButton(
                     Box(Modifier.clickable {
                         navController.navigateUp()
                     }.width(60.dp), contentAlignment = Alignment.Center) {
-                        Text(
+                        OutlinedText(
                             "Back",
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            style =
-                                LocalTextStyle.current.merge(
-                                    TextStyle(
-                                        color = TsukaremiTheme.colors.characterColor,
-                                        drawStyle = Stroke(
-                                            width = 6f,
-                                            join = StrokeJoin.Round
-                                        )
-                                    )
-
-                                )
+                            outlineColor = TsukaremiTheme.colors.characterColor
                         )
-                        Text("Back", color = Color.White)
                     }
                 }
             }

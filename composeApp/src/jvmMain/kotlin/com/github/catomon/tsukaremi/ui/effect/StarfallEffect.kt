@@ -99,12 +99,12 @@ private suspend fun animateStar(star: Star, fallDuration: Int = 12000) {
 }
 
 @Composable
-fun Starfall(image: ImageBitmap, modifier: Modifier = Modifier, fallDuration: Int = 12000) {
+fun Starfall(image: ImageBitmap, modifier: Modifier = Modifier, fallDuration: Int = 12000, starCount: Int = 24) {
     Box(
         modifier = modifier
     ) {
         val stars = remember {
-            List(24) {
+            List(starCount) {
                 Star()
             }
         }
