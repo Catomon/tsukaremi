@@ -10,6 +10,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,15 +20,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -39,10 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -72,6 +68,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import tsukaremi.composeapp.generated.resources.Res
 import tsukaremi.composeapp.generated.resources.star
 import tsukaremi.composeapp.generated.resources.top_bar_background
+import tsukaremi.composeapp.generated.resources.top_bar_background_overlay
 import tsukaremi.composeapp.generated.resources.tsukasa_sleepy
 import kotlin.system.exitProcess
 
@@ -97,8 +94,8 @@ fun TsukaremiMainScreen(
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
-            TsukaremiTheme.colors.gradientStart,
-            TsukaremiTheme.colors.gradientEnd
+            TsukaremiTheme.colors.background2,
+            TsukaremiTheme.colors.background2,
         ),
         start = androidx.compose.ui.geometry.Offset.Zero,
         end = androidx.compose.ui.geometry.Offset.Infinite
@@ -107,11 +104,12 @@ fun TsukaremiMainScreen(
     Box(
         modifier = Modifier.fillMaxSize().background(gradientBrush),
     ) {
-        Starfall(imageResource(Res.drawable.star))
+        if (viewModel.appSettings.value.showEffects)
+            Starfall(imageResource(Res.drawable.star))
 
         Image(
             painter = painterResource(Res.drawable.tsukasa_sleepy),
-            modifier = Modifier.align(Alignment.BottomEnd).offset(y = 20.dp),
+            modifier = Modifier.align(Alignment.BottomEnd),//.offset(y = 20.dp),
             contentDescription = null
         )
 
@@ -124,16 +122,30 @@ fun TsukaremiMainScreen(
                 modifier = Modifier
                     .fillMaxWidth()
 //                .padding(horizontal = 6.dp)
-                    .height(100.dp),
+                    .height(100.dp)
+                    .background(color = TsukaremiTheme.colors.characterColor.darken(1.2f), shape = RoundedCornerShape(0.dp, 0.dp, 8.dp, 8.dp))
+                    .border(
+                        color = TsukaremiTheme.colors.characterColor.darken(1.2f),
+                        width = 4.dp,
+                        shape = RoundedCornerShape(0.dp, 0.dp, 8.dp, 8.dp)
+                    ),
             ) {
                 Image(
                     painterResource(Res.drawable.top_bar_background),
                     null,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.matchParentSize().clip(
-                        RoundedCornerShape(0.dp, 0.dp, 8.dp, 8.dp)
-                    )
+                    modifier = Modifier.matchParentSize()
                 )
+
+//                Image(
+//                    painterResource(Res.drawable.top_bar_background_overlay),
+//                    null,
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier.matchParentSize().clip(
+//                        RoundedCornerShape(0.dp, 0.dp, 8.dp, 8.dp)
+//                    ),
+//                    colorFilter = ColorFilter.tint(TsukaremiTheme.colors.characterColor)
+//                )
 
                 SettingsButton({
                     navigateToSettings(currentScreen, navController)
@@ -169,7 +181,7 @@ fun TsukaremiMainScreen(
                         outlineSize = 6f
                     )
 
-                    HideInTrayButton(modifier = Modifier.padding( end = 12.dp)) {
+                    HideInTrayButton(modifier = Modifier.padding(end = 12.dp)) {
                         onCloseRequest()
                     }
                 }
@@ -270,7 +282,7 @@ fun MainScreenNavButton(
                             "New",
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                           outlineColor = TsukaremiTheme.colors.characterColor,
+                            outlineColor = TsukaremiTheme.colors.characterColor,
                             outlineSize = 4f
                         )
                     }

@@ -10,12 +10,13 @@ interface MyShell32 : Shell32 {
     companion object {
         val INSTANCE = Native.load("shell32", MyShell32::class.java)
 
-        var QUNS_NOT_PRESENT: Int = 1
-        var QUNS_BUSY: Int = 2
-        var QUNS_RUNNING_D3D_FULL_SCREEN: Int = 3
-        var QUNS_PRESENTATION_MODE: Int = 4
-        var QUNS_ACCEPTS_NOTIFICATIONS: Int = 5
-        var QUNS_QUIET_TIME: Int = 6
+        const val QUNS_NOT_PRESENT = 1
+        const val QUNS_BUSY = 2
+        const val QUNS_RUNNING_D3D_FULL_SCREEN = 3
+        const val QUNS_PRESENTATION_MODE = 4
+        const val QUNS_ACCEPTS_NOTIFICATIONS = 5
+        const val QUNS_QUIET_TIME = 6
+        const val QUNS_APP = 7
     }
 }
 
@@ -28,12 +29,12 @@ fun canAlwaysOnTop(): Boolean {
     val hr: Int = MyShell32.INSTANCE.SHQueryUserNotificationState(state)
     if (hr == 0) { // S_OK
         val quns = state.value
-        return quns !in listOf(
-            MyShell32.QUNS_RUNNING_D3D_FULL_SCREEN,
-            MyShell32.QUNS_PRESENTATION_MODE,
-            MyShell32.QUNS_BUSY
-        )
+        return quns == MyShell32.QUNS_ACCEPTS_NOTIFICATIONS ||
+                quns == MyShell32.QUNS_APP
     }
-
     return false
+}
+
+fun shouldShowNotification(): Boolean {
+    return isNotificationAllowed() && canAlwaysOnTop()
 }

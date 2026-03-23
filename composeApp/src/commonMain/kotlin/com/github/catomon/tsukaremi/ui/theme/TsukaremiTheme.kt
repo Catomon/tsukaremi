@@ -241,13 +241,14 @@ object TsukaremiTheme {
 
 object TsukaremiColors {
     val background = Color(0xfff39534)
+    val background2 = Color(-342935)
     val gradientStart = Color(0xfffd7849)
     val gradientEnd = Color(0xfffbfd82)
 
-    val componentBorder =  Color(0xfff39534).darken()
+    val componentBorder = Color(0xfff39534).darken()
 
-    val windowBorderGradientStart =   Color(0xff7f57c6)
-    val windowBorderGradientEnd =   Color(0xfff39534)
+    val windowBorderGradientStart = Color(0xff7f57c6)
+    val windowBorderGradientEnd = Color(0xfff39534)
 
     val characterColor = Color(0xff7f57c6)
 

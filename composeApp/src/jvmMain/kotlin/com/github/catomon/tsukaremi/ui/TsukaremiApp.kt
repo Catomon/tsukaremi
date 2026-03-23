@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.github.catomon.tsukaremi.domain.model.Reminder
+import com.github.catomon.tsukaremi.ui.compositionlocals.LocalAppSettings
 import com.github.catomon.tsukaremi.ui.viewmodel.MainViewModel
 import com.github.catomon.tsukaremi.ui.windows.ReminderWindow
 import com.github.catomon.tsukaremi.ui.windows.TsukaremiMainWindow
@@ -56,6 +57,7 @@ fun ApplicationScope.TsukaremiApp() =
     CompositionLocalProvider(LocalViewModelStoreOwner provides AppViewModelStoreOwner) {
         val viewModel: MainViewModel = koinViewModel()
 
+
         val trayState = rememberTrayState()
 
         val shownReminders = remember { mutableStateListOf<Reminder>() }
@@ -74,30 +76,36 @@ fun ApplicationScope.TsukaremiApp() =
                 hideInTray = !hideInTray
             })
 
+        val appSettings by viewModel.appSettings.collectAsState()
+
         if (shownReminders.isNotEmpty())
             shownReminders.takeLast(3).reversed().forEachIndexed { i, reminder ->
                 key(reminder) {
-                    ReminderWindow(
-                        reminder,
-                        state = remember(i) {
-                            WindowState(
-                                size = WindowConfig.reminderWindowSize,
-                                position = WindowPosition(
-                                    screenWidth.dp - WindowConfig.reminderWindowSize.width - 12.dp,
-                                    screenHeight.dp - (WindowConfig.reminderWindowSize.height * (i + 1) + 48.dp)
+                    CompositionLocalProvider(LocalAppSettings provides appSettings) {
+                        ReminderWindow(
+                            reminder,
+                            state = remember(i) {
+                                WindowState(
+                                    size = WindowConfig.reminderWindowSize,
+                                    position = WindowPosition(
+                                        screenWidth.dp - WindowConfig.reminderWindowSize.width - 12.dp,
+                                        screenHeight.dp - (WindowConfig.reminderWindowSize.height * (i + 1) + 48.dp)
+                                    )
                                 )
-                            )
-                        },
-                        onRestart = {
-                            viewModel.viewModelScope.launch {
-                                viewModel.reminderManager.restartReminder(reminder)
+                            },
+                            onRestart = {
+                                viewModel.viewModelScope.launch {
+                                    viewModel.reminderManager.restartReminder(reminder)
+                                    shownReminders -= reminder
+                                }
+                            },
+                            onDismiss = {
                                 shownReminders -= reminder
-                            }
-                        },
-                        onDismiss = {
-                            shownReminders -= reminder
-                        }
-                    )
+                            },
+                            windowBehavior = viewModel.appSettings.value.windowBehavior,
+                            reminderMode = viewModel.appSettings.value.reminderMode
+                        )
+                    }
                 }
             }
     }

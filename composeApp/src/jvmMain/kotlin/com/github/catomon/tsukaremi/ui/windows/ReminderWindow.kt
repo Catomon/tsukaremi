@@ -46,12 +46,16 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
+import com.github.catomon.tsukaremi.data.local.ReminderMode
+import com.github.catomon.tsukaremi.data.local.WindowBehavior
 import com.github.catomon.tsukaremi.domain.model.Reminder
 import com.github.catomon.tsukaremi.ui.components.OutlinedText
+import com.github.catomon.tsukaremi.ui.compositionlocals.LocalAppSettings
 import com.github.catomon.tsukaremi.ui.effect.Starfall
 import com.github.catomon.tsukaremi.ui.modifiers.blurredShadow
 import com.github.catomon.tsukaremi.ui.modifiers.customShadow
 import com.github.catomon.tsukaremi.ui.theme.TsukaremiTheme
+import com.github.catomon.tsukaremi.ui.util.darken
 import com.github.catomon.tsukaremi.ui.util.playSound
 import com.github.catomon.tsukaremi.util.canAlwaysOnTop
 import com.github.catomon.tsukaremi.util.fromUtcToSystemZoned
@@ -70,23 +74,35 @@ fun ReminderWindow(
     onRestart: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    state: WindowState = rememberWindowState(size = WindowConfig.reminderWindowSize)
+    state: WindowState = rememberWindowState(size = WindowConfig.reminderWindowSize),
+    windowBehavior: WindowBehavior,
+    reminderMode: ReminderMode
 ) {
-    Window(
-        state = state,
-        onCloseRequest = onDismiss,
-        undecorated = true,
-        transparent = true,
-        alwaysOnTop = canAlwaysOnTop(),
-        resizable = false
-    ) {
-        window.focusableWindowState = false
-        window.isFocusable = false
+    LaunchedEffect(Unit) {
+        if (reminderMode != ReminderMode.WITHOUT_SOUND) {
+            playSound("se_mop.wav")
 
-        TsukaremiTheme {
-            ReminderWindowContent(reminder, onRestart, onDismiss, modifier.fillMaxSize())
+            if (reminderMode == ReminderMode.SOUND_ONLY)
+                onDismiss()
         }
     }
+
+    if (reminderMode != ReminderMode.SOUND_ONLY)
+        Window(
+            state = state,
+            onCloseRequest = onDismiss,
+            undecorated = true,
+            transparent = true,
+            alwaysOnTop = canAlwaysOnTop() && windowBehavior == WindowBehavior.ALWAYS_ON_TOP,
+            resizable = false
+        ) {
+            window.focusableWindowState = false
+            window.isFocusable = false
+
+            TsukaremiTheme {
+                ReminderWindowContent(reminder, onRestart, onDismiss, modifier.fillMaxSize())
+            }
+        }
 }
 
 @Composable
@@ -96,10 +112,6 @@ private fun ReminderWindowContent(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) = Surface(modifier.luckyReminderWindowDecoration()) {
-
-    LaunchedEffect(Unit) {
-        playSound("se_mop.wav")
-    }
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
@@ -135,18 +147,30 @@ private fun ReminderWindowContent(
 //            colorFilter = ColorFilter.tint(Color(0x4d9775d5))
 //        )
 
-        Starfall(imageResource(Res.drawable.star), fallDuration = 4000, starCount = 12)
+        val settings = LocalAppSettings.current
+        if (settings.showEffects)
+            Starfall(imageResource(Res.drawable.star), fallDuration = 4000, starCount = 12)
 
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.background(gradientBrush2)) {
             AsyncImage(
                 "assets/c29282c9a734ccddb8a40b2f9eda555c.gif",
                 contentDescription = null,
-                modifier = Modifier.size(96.dp),
+                modifier = Modifier.size(96.dp)
+                    .background(
+                        color = TsukaremiTheme.colors.characterColor.darken(1.2f),
+                        shape = RoundedCornerShape(0.dp, 8.dp, 8.dp, 0.dp)
+                    )
+                    .border(
+                        color = TsukaremiTheme.colors.characterColor.darken(1.2f),
+                        width = 4.dp,
+                        shape = RoundedCornerShape(0.dp, 8.dp, 8.dp, 0.dp)
+                    ),
                 contentScale = ContentScale.Crop
             )
 
             Column(
-                Modifier.weight(1f).padding(horizontal = 6.dp, vertical = 12.dp).verticalScroll(remember { ScrollState(0)})
+                Modifier.weight(1f).padding(horizontal = 6.dp, vertical = 12.dp)
+                    .verticalScroll(remember { ScrollState(0) })
             ) {
                 OutlinedText(
                     reminder.title,
@@ -168,7 +192,8 @@ private fun ReminderWindowContent(
         DismissButton(onDismiss, Modifier.align(Alignment.TopEnd).padding(end = 12.dp, top = 12.dp))
 
         Box(
-            modifier = Modifier.fillMaxHeight().padding(end = 6.dp, top = 12.dp, bottom = 12.dp).align(Alignment.BottomEnd),
+            modifier = Modifier.fillMaxHeight().padding(end = 6.dp, top = 12.dp, bottom = 12.dp)
+                .align(Alignment.BottomEnd),
             contentAlignment = Alignment.BottomEnd
         ) {
             AnimatedContent(isHovered, transitionSpec = {
